@@ -77,8 +77,13 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
   - [x] `constants.ts` — вывод типов (inference), `as const` на `ACTIVE_PROMOTIONS`
   - [x] `formatters.ts` — `formatPrice(price: number): string`, убран лишний `parseFloat`
   - [ ] `useDragToScroll`, `useOrderTotals` — React-хуки, отложены на фазу 7 (вместе с компонентами)
-- [ ] **Фаза 4. API-слой** (`apiService.ts`) — типизация `fetch`, паттерн `{ data, error }`,
-      **маппер `ProductDto → Product`** (`Number(price)`).
+- [x] **Фаза 4. API-слой** (`apiService.ts`). ✅
+  - [x] `ApiResult<T>` — дженерик-тип результата
+  - [x] `isObject` (type guard), `Array.isArray` как встроенный guard
+  - [x] `fetchWithErrorHandling<T>` — дженерик-функция, `unknown` + `as T` на границе
+  - [x] `mapProductToDomain` — маппер `ProductDto → Product` (`Number(price)`)
+  - [x] методы `apiService` (`get*`) с явными тип-аргументами и `import type`
+  - [x] исправлен `API_BASE_URL` (`fastfood` → `fastfoodTS`)
 - [ ] **Фаза 5. Инфраструктура UI** — `router/` (`Router`, `navigate`, `Link`), затем `BottomNav`.
 - [ ] **Фаза 6. Контекст корзины** — `CartProvider`, `useCart`.
 - [ ] **Фаза 7. Компоненты и страницы** (снизу вверх) — мелкие → секции → страницы → `App`.
@@ -93,3 +98,9 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
 - Литеральные типы и когда их НЕ применять (открытый набор извне)
 - `null` vs `undefined`, `| null` vs `?`, роль `strictNullChecks`
 - Утилитные типы: `Omit<T, K>` = `Pick<T, Exclude<keyof T, K>>`, `keyof`, `extends` для интерфейсов
+- Дженерики: у типов (`ApiResult<T>`) и у функций (`fetchWithErrorHandling<T>`, вывод `T` в `.map`)
+- Type guards и предикаты типа (`data is ...`), сужение типа; `typeof` как встроенный guard
+- Стирание типов в рантайме; `import type`; `any` vs `unknown` vs `as` (точка доверия на границе)
+- `Promise<T>` и распаковка через `await` (две обёртки: Promise → ApiResult → data)
+- Два мира — типы vs значения (Omit vs spread, конфликт `extends` vs «последний побеждает»)
+- Стрелочные функции: блочное `=> {}` vs краткое `=> ({})` тело; point-free стиль в `.map`
