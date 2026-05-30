@@ -15,7 +15,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Алиас @ → src: дублирует resolve.alias из vite.config.ts, чтобы tsc тоже понимал импорты. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
