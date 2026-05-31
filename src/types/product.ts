@@ -14,3 +14,8 @@ export interface ProductDto {
   export interface Product extends Omit<ProductDto, 'price'> {
     price: number;
   }
+
+  // 3. Доменная модель с названием категории. Собирается на MenuPage, используется в поиске.
+export interface ProductWithCategoryTitle extends Product {
+  category_title: string;
+}

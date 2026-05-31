@@ -1,0 +1,22 @@
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 10;
+  box-sizing: border-box;
+  width: min(100%, var(--app-max-width));
+  padding: var(--app-block-padding) var(--app-inline-padding) clamp(8px, 2.4vw, 12px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.menu-page--with-fixed-menu-header {
+  padding-top: max(
+    0px,
+    calc(
+      var(--menu-header-height) + clamp(10px, 2.8vw, 16px) - var(--app-block-padding)
+    )
+  );
+}
+
