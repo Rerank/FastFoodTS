@@ -69,6 +69,8 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
 
 - [ ] Заглушка для картинок при `image_name`/`avatar_file_name === null` (`?? 'placeholder.webp'`),
       чтобы убрать `.../null`. Кандидат на решение в маппере (домен без `null`) либо в компонентах.
+- [ ] `ProductPage`: строка с `category_title` закомментирована (поля нет у одиночного `Product`).
+      Решить: убрать совсем или подтягивать категорию реально.
 
 ## 🗺 Этапы
 
