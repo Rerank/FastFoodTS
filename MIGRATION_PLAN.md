@@ -84,9 +84,20 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
   - [x] `mapProductToDomain` — маппер `ProductDto → Product` (`Number(price)`)
   - [x] методы `apiService` (`get*`) с явными тип-аргументами и `import type`
   - [x] исправлен `API_BASE_URL` (`fastfood` → `fastfoodTS`)
-- [ ] **Фаза 5. Инфраструктура UI** — `router/` (`Router`, `navigate`, `Link`), затем `BottomNav`.
-- [ ] **Фаза 6. Контекст корзины** — `CartProvider`, `useCart`.
-- [ ] **Фаза 7. Компоненты и страницы** (снизу вверх) — мелкие → секции → страницы → `App`.
+- [x] **Фаза 5. Примитивы роутинга** — `navigate.ts`, `Link.tsx`. ✅
+  - [x] `navigate.ts` — `path: string`, браузерные API уже типизированы DOM lib
+  - [x] `Link.tsx` — первый React-компонент: пропсы через `interface ... extends ComponentPropsWithoutRef<'a'>`,
+        событие `MouseEvent<HTMLAnchorElement>`, `import type`
+- [x] **Фаза 6. Контекст корзины** — `CartProvider`, `useCart`. ✅
+  - [x] `types/cart.ts` — `CartItem extends Product`, `CartContextValue` (функции как поля)
+  - [x] `useCart.ts` — `createContext<CartContextValue | undefined>(undefined)` + хук с сужением
+  - [x] `CartProvider.tsx` — `useState<CartItem[]>([])`, `reduce` с типом acc, пропсы `{ children: ReactNode }`
+- [ ] **Фаза 7. Компоненты и страницы** (снизу вверх) — мелкие → секции → страницы.
+      `BottomNav` здесь (после корзины — нужен `useCart`).
+- [ ] **Фаза 8. Корни дерева** — `Router.tsx` (зависит от ВСЕХ страниц) и `App.tsx` — в самом конце.
+
+> Перестановка vs изначальный план: `Router` оказался не листом, а корнем (импортирует все страницы),
+> поэтому уехал в конец. `navigate`/`Link` — настоящие листья, делаем первыми.
 
 ---
 
