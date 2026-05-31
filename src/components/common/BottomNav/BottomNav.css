@@ -1,0 +1,80 @@
+.bottom-nav {
+  position: fixed;
+  right: 50%;
+  bottom: clamp(10px, 2.8vh, 18px);
+  z-index: 20;
+  display: grid;
+  width: min(calc(100vw - var(--app-inline-space)), calc(var(--app-max-width) - var(--app-inline-space)));
+  grid-template-columns: repeat(3, 1fr);
+  padding: clamp(7px, 2vw, 10px) clamp(8px, 2.4vw, 14px);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 1px 16px rgba(26, 26, 26, 0.25);
+  transform: translateX(50%);
+  backdrop-filter: blur(14px);
+}
+
+.bottom-nav__item {
+  display: grid;
+  place-items: center;
+  gap: clamp(3px, 1vw, 5px);
+  min-height: clamp(48px, 12vw, 58px);
+  color: #828282;
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 700;
+}
+
+.bottom-nav__icon {
+  width: clamp(19px, 5vw, 24px);
+  height: clamp(19px, 5vw, 24px);
+  background-color: currentColor; 
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+
+}
+
+.bottom-nav__icon--profile {
+  mask-image: url('/images/profile.svg');
+}
+.bottom-nav__icon--menu {
+  mask-image: url('/images/menu.svg');
+}
+.bottom-nav__icon--cart {
+  mask-image: url('/images/cart.svg');
+}
+
+.bottom-nav__item.active {
+  color: var(--color-primary);
+}
+
+
+.bottom-nav__icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Стили бейджа */
+.bottom-nav__badge {
+  position: absolute;
+  top: -3px;
+  right: -8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 2px; 
+  border-radius: 10px;
+
+  background-color: var(--color-primary, #ff5e00); /* Используй свой цвет акцента */
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border: 2px solid #fff; 
+  pointer-events: none;
+}

@@ -1,0 +1,32 @@
+.promo-carousel {
+  display: grid;
+  grid-auto-columns: clamp(260px, 82vw, 480px);
+  grid-auto-flow: column;
+  gap: clamp(10px, 3vw, 16px);
+  margin-right: calc(0px - var(--app-inline-padding));
+  margin-left: calc(0px - var(--app-inline-padding));
+  padding: clamp(6px, 2vw, 10px) var(--app-inline-padding) clamp(16px, 4vw, 24px);
+  overflow-x: auto;
+  scroll-padding-inline: var(--app-inline-padding);
+  scrollbar-width: none;
+}
+
+.promo-carousel.is-dragging {
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.promo-carousel.is-dragging * {
+  pointer-events: none;
+  user-select: none;
+}
+
+.promo-carousel img {
+  -webkit-user-drag: none;
+}
+
+.promo-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+

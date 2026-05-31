@@ -92,8 +92,13 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
   - [x] `types/cart.ts` — `CartItem extends Product`, `CartContextValue` (функции как поля)
   - [x] `useCart.ts` — `createContext<CartContextValue | undefined>(undefined)` + хук с сужением
   - [x] `CartProvider.tsx` — `useState<CartItem[]>([])`, `reduce` с типом acc, пропсы `{ children: ReactNode }`
-- [ ] **Фаза 7. Компоненты и страницы** (снизу вверх) — мелкие → секции → страницы.
-      `BottomNav` здесь (после корзины — нужен `useCart`).
+- [~] **Фаза 7. Компоненты и страницы** (снизу вверх).
+  - [x] Слой 1 (листья): `ErrorState`, `BottomNav`, `PromoCard`, `NotFoundPage`,
+        хуки `useOrderTotals` (payoff: цена-число), `useDragToScroll` (ref + pointer-события).
+        Скелетоны отложены к своим страницам.
+  - [ ] Слой 2 (составные): `PromoCarousel`, `CategoryTabs`, `SearchField`, `SearchResultsList`,
+        `MenuHeader`, `MenuSection`.
+  - [ ] Слой 3 (страницы): `MenuPage`, `CartPage`, `ProfilePage`, `ProductPage`.
 - [ ] **Фаза 8. Корни дерева** — `Router.tsx` (зависит от ВСЕХ страниц) и `App.tsx` — в самом конце.
 
 > Перестановка vs изначальный план: `Router` оказался не листом, а корнем (импортирует все страницы),

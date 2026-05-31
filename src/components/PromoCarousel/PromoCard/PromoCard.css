@@ -1,0 +1,72 @@
+.promo-card {
+    position: relative;
+    min-height: clamp(108px, 28vw, 154px);
+    padding: clamp(16px, 4vw, 24px);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    scroll-snap-align: start;
+    box-shadow: 0 2px 8px rgb(21 21 21 / 15%);
+  }
+  
+  .promo-card__offer-image {
+    position: absolute;
+    right: clamp(-14px, -2vw, -6px);
+    bottom: clamp(-38px, -6vw, -30px);
+    width: clamp(96px, 28vw, 150px);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  .promo-card__label {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    margin-bottom: clamp(14px, 4vw, 22px);
+    padding: clamp(4px, 1.4vw, 6px) clamp(9px, 2.4vw, 12px);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.26);
+    font-size: clamp(10px, 2.5vw, 12px);
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  
+  .promo-card--hot {
+    color: #ffffff;
+    background: linear-gradient(135deg, #eda734 0%, #fd6b39 100%);
+  }
+  
+  .promo-card--combo {
+    color: #321700;
+    background: linear-gradient(135deg, #ffd84a 0%, #ff9b20 100%);
+  }
+  
+  .promo-card--delivery {
+    color: #153a24;
+    background: linear-gradient(135deg, #d9ffd9 0%, #8edb87 100%);
+  }
+
+  .promo-card--delivery .promo-card__offer-image {
+    bottom: clamp(-16px, -2.5vw, -8px)
+  }
+  
+  .promo-card__title,
+  .promo-card__text {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+  }
+  
+  .promo-card__title {
+    max-width: clamp(140px, 42vw, 230px);
+    font-size: clamp(20px, 5.5vw, 32px);
+    margin-bottom: 7px;
+    line-height: 1.05;
+  }
+  
+  .promo-card__text {
+    margin-top: clamp(4px, 1.4vw, 7px);
+    font-size: clamp(11px, 2.5vw, 16px);
+    font-weight: 400;
+    opacity: 0.9;
+  }
