@@ -1,0 +1,123 @@
+.app--skeleton {
+    background: #ffffff;
+  }
+  
+  .skeleton-header {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    z-index: 10;
+    box-sizing: border-box;
+    width: min(100%, var(--app-max-width));
+    padding: var(--app-block-padding) var(--app-inline-padding) clamp(8px, 2.4vw, 12px);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+  }
+  
+  .skeleton-search,
+  .skeleton-block,
+  .skeleton-line,
+  .skeleton-button {
+    background: linear-gradient(90deg, #f1f1f1 0%, #f8f8f8 48%, #f1f1f1 100%);
+    background-size: 220% 100%;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+  
+  .skeleton-search {
+    min-height: clamp(42px, 10vw, 52px);
+    border-radius: 999px;
+  }
+  
+  .menu-section {
+    padding-top: clamp(12px, 3.5vw, 20px);
+  }
+  
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: clamp(12px, 3.4vw, 18px);
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(136px, 31vw, 168px), 1fr));
+    align-items: start;
+    gap: var(--fluid-gap);
+  }
+  
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    aspect-ratio: 4 / 5;
+    padding: clamp(6px, 1.8vw, 10px);
+    border: 1px solid #f1f1f1;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: 0 4px 12px rgba(24, 24, 24, 0.08);
+    overflow: hidden;
+  }
+  
+  .product-card__image {
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    border-radius: var(--radius-md);
+  }
+  
+  .product-card__body {
+    flex: 0 0 auto;
+    padding: clamp(6px, 1.8vw, 12px) clamp(2px, 1vw, 6px) clamp(2px, 1vw, 5px);
+  }
+  
+  .product-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(6px, 1.8vw, 10px);
+  }
+  
+  .skeleton-line {
+    height: clamp(10px, 2.8vw, 14px);
+    border-radius: 999px;
+  }
+  
+  .skeleton-line--title {
+    width: min(32vw, 150px);
+    height: clamp(24px, 6vw, 32px);
+  }
+  
+  .skeleton-line--name {
+    width: 78%;
+  }
+  
+  .skeleton-line--weight {
+    width: 44%;
+    height: clamp(8px, 2.2vw, 11px);
+    margin: clamp(6px, 1.8vw, 9px) 0 clamp(8px, 2vw, 11px);
+  }
+  
+  .skeleton-line--price {
+    width: 48%;
+    height: clamp(12px, 3.2vw, 16px);
+  }
+  
+  .skeleton-button {
+    width: clamp(24px, 7vw, 34px);
+    height: clamp(24px, 7vw, 34px);
+    flex: 0 0 auto;
+    border-radius: 50%;
+  }
+  
+  @keyframes skeleton-pulse {
+    0% {
+      background-position: 100% 0;
+    }
+  
+    100% {
+      background-position: -100% 0;
+    }
+  }
+  
