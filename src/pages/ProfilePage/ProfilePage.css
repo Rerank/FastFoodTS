@@ -1,0 +1,164 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 6vw, 34px);
+  padding-top: clamp(14px, 4vw, 22px);
+}
+
+.profile-hero {
+  display: grid;
+  grid-template-columns: clamp(72px, 24vw, 118px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(14px, 4vw, 22px);
+  padding: clamp(16px, 4.5vw, 24px);
+  margin-top: 30px;
+  border: 1px solid #f1f1f1;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top right, rgba(246, 131, 48, 0.18), transparent 38%),
+    var(--color-surface);
+  box-shadow: 0 4px 12px rgba(24, 24, 24, 0.15);
+}
+
+.profile-hero__avatar {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  box-shadow: 0 3px 16px rgba(24, 24, 24, 0.15);
+}
+
+.profile-hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.profile-hero__name {
+  margin: 0;
+  font-size: clamp(20px, 6vw, 32px);
+  line-height: 1.08;
+}
+
+.profile-hero__phone {
+  display: inline-flex;
+  margin-top: clamp(6px, 1.8vw, 10px);
+  color: #666666;
+  font-size: clamp(14px, 3.7vw, 17px);
+  font-weight: 700;
+  margin: 5px 0 5px 0;
+}
+
+.profile-hero__edit {
+  min-height: clamp(30px, 8vw, 36px);
+  margin-top: 5px;
+  padding: 0 clamp(10px, 3vw, 14px);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: #5f5f5f;
+  background: #f5f5f5;
+  font-size: clamp(11px, 3vw, 14px);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-section {
+  padding-top: clamp(2px, 1vw, 6px);
+}
+
+.profile-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(12px, 3.4vw, 18px);
+}
+
+.profile-section__title {
+  margin: 0;
+  font-size: clamp(18px, 4.7vw, 26px);
+  line-height: 1.15;
+}
+
+.profile-list {
+  display: grid;
+  gap: var(--fluid-gap);
+}
+
+.profile-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(12px, 3.4vw, 18px);
+  align-items: center;
+  min-width: 0;
+  padding: clamp(14px, 4vw, 20px);
+  border: 1px solid #f1f1f1;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 3px 12px rgba(24, 24, 24, 0.13);
+}
+
+.profile-item__icon {
+  display: inline-grid;
+  width: clamp(44px, 12vw, 56px);
+  height: clamp(44px, 12vw, 56px);
+  place-items: center;
+}
+
+.profile-item__icon-image {
+  display: block;
+  width: clamp(26px, 8vw, 38px);
+  height: clamp(26px, 8vw, 38px);
+}
+
+.profile-item__content {
+  min-width: 0;
+}
+
+.profile-item__title,
+.profile-item__text,
+.profile-item__meta {
+  margin: 0;
+}
+
+.profile-item__title {
+  font-size: clamp(12px, 3.2vw, 14px);
+  font-weight: 800;
+  color: var(--color-muted);
+}
+
+.profile-item__text {
+  margin-top: clamp(4px, 1.2vw, 6px);
+  overflow: hidden;
+  font-size: clamp(16px, 4.3vw, 20px);
+  font-weight: 800;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-item__meta {
+  margin-top: clamp(4px, 1.2vw, 6px);
+  color: #666666;
+  font-size: clamp(12px, 3.2vw, 14px);
+  font-weight: 600;
+}
+
+
+/* Класс для состояния загрузки (скелетона) */
+.skeleton {
+  background-color: #e0e0e0 !important;
+  color: transparent !important;
+  /* Делаем текст невидимым */
+  border-radius: 4px;
+  pointer-events: none;
+  /* Отключаем клики (важно для кнопок) */
+  border-color: transparent !important;
+  /* Убираем рамки, если они есть */
+}
+
+/* Возвращаем круглое скругление для аватарки-скелетона */
+.profile-hero__avatar.skeleton {
+  border-radius: 50%;
+}
