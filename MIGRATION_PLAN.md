@@ -96,9 +96,10 @@ GET user.php?id=1  → { id:1, name, phone:"+7 (...)", avatar_file_name:"avatar.
   - [x] Слой 1 (листья): `ErrorState`, `BottomNav`, `PromoCard`, `NotFoundPage`,
         хуки `useOrderTotals` (payoff: цена-число), `useDragToScroll` (ref + pointer-события).
         Скелетоны отложены к своим страницам.
-  - [ ] Слой 2 (составные): `PromoCarousel`, `CategoryTabs`, `SearchField`, `SearchResultsList`,
-        `MenuHeader`, `MenuSection`.
-  - [ ] Слой 3 (страницы): `MenuPage`, `CartPage`, `ProfilePage`, `ProductPage`.
+  - [x] Слой 2 (составные): `PromoCarousel`, `SearchField`/`SearchResultsList` (+ тип
+        `ProductWithCategoryTitle`), `MenuHeader`, `ProductCard`/`MenuSection`,
+        `CategoryTabs` (React 19: `ref`-как-проп вместо `forwardRef`).
+  - [ ] Слой 3 (страницы): `ProfilePage`, `ProductPage`, `CartPage`, `MenuPage` (+ скелетоны).
 - [ ] **Фаза 8. Корни дерева** — `Router.tsx` (зависит от ВСЕХ страниц) и `App.tsx` — в самом конце.
 
 > Перестановка vs изначальный план: `Router` оказался не листом, а корнем (импортирует все страницы),

@@ -1,0 +1,203 @@
+/* Карточка сохраняет пропорции 4:5 на любой ширине без media queries. */
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  padding: clamp(6px, 1.8vw, 10px);
+  border: 1px solid #f1f1f1;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 4px 12px rgba(24, 24, 24, 0.15);
+  overflow: hidden;
+}
+
+/* Изображение заполняет свободную высоту карточки, а текстовый блок остается компактным. */
+/* Клики проходят к растянутой ссылке; кнопка «+» остаётся интерактивной (z-index: 2). */
+.product-card__image,
+.product-card__weight,
+.product-card__price {
+  pointer-events: none;
+}
+
+.product-card__image {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  height: auto;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  object-position: center;
+}
+
+.product-card__body {
+  flex: 0 0 auto;
+  padding: clamp(6px, 1.8vw, 12px) clamp(2px, 1vw, 6px) clamp(2px, 1vw, 5px);
+}
+
+.product-card__title {
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(12px, 3.2vw, 16px);
+  font-weight: 800;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Псевдоэлемент растягивает кликабельную зону ссылки на всю карточку.
+     z-index: 1 — ниже кнопки (z-index: 2), поэтому кнопка ловит свои клики. */
+.product-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Карточка слегка «вдавливается» только при нажатии на ссылку,
+   но НЕ при нажатии на кнопку «+» (у неё своя анимация tap-effect). */
+.product-card {
+  transition: transform 0.1s ease-in-out;
+}
+
+.product-card:has(.product-card__link:active) {
+  transform: scale(0.98);
+}
+
+.product-card__weight {
+  margin: clamp(2px, 0.8vw, 4px) 0 clamp(5px, 1.6vw, 9px);
+  color: var(--color-muted);
+  font-size: clamp(10px, 2.7vw, 12px);
+  font-weight: 600;
+}
+
+.product-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(6px, 1.8vw, 10px);
+  /* Место под круглую кнопку (absolute), чтобы цена не заходила под неё */
+  padding-right: clamp(38px, 10vw, 48px);
+}
+
+.product-card__price {
+  font-size: clamp(13px, 3.6vw, 18px);
+  font-weight: 800;
+}
+
+.add-button {
+  position: absolute;
+  right: clamp(10px, 2.8vw, 14px);
+  bottom: clamp(10px, 2.8vw, 14px);
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(30px, 8vw, 42px);
+  height: clamp(30px, 8vw, 42px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--color-primary);
+  font-size: clamp(20px, 6vw, 30px);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-button.is-added {
+  background: #2fbf71;
+  font-size: clamp(12px, 3.5vw, 16px);
+  font-weight: 800;
+}
+
+.add-button__label {
+  display: block;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.add-button__label.is-added {
+  transform: translateY(0);
+}
+
+
+/* Пустое состояние корзины (разметка: CartPage) */
+.cart-empty {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: clamp(220px, 52vh, 420px);
+  margin-top: clamp(8px, 2.4vw, 16px);
+  padding-inline: clamp(10px, 3vw, 16px);
+  text-align: center;
+}
+
+.cart-empty__panel {
+  width: min(100%, 360px);
+  padding: clamp(22px, 6vw, 32px) clamp(18px, 5vw, 26px) clamp(20px, 5.5vw, 28px);
+  border: 1px solid #f1f1f1;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(246, 131, 48, 0.18), transparent 52%),
+    radial-gradient(circle at 92% 88%, rgba(246, 131, 48, 0.1), transparent 48%),
+    var(--color-surface);
+  box-shadow: 0 4px 16px rgba(24, 24, 24, 0.1);
+}
+
+.cart-empty__illustration {
+  display: grid;
+  place-items: center;
+  width: min(240px, 72vw);
+  aspect-ratio: 5 / 4;
+  margin: 0 auto clamp(14px, 4vw, 20px);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #fff8f3 0%, #ffffff 72%);
+}
+
+.cart-empty__img {
+  width: clamp(148px, 46vw, 200px);
+  height: auto;
+  object-fit: contain;
+}
+
+.cart-empty__title {
+  margin: 0;
+  font-size: clamp(22px, 5.8vw, 28px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.cart-empty__lead {
+  margin: clamp(8px, 2.6vw, 12px) 0 clamp(18px, 5vw, 24px);
+  color: var(--color-muted);
+  font-size: clamp(14px, 3.6vw, 16px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.cart-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(46px, 12vw, 52px);
+  padding: 0 clamp(26px, 7vw, 36px);
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--color-primary);
+  box-shadow: 0 10px 22px rgba(246, 131, 48, 0.26);
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 800;
+}
