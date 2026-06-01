@@ -1,7 +1,8 @@
 import { useCart } from '@/context/useCart';
-import { IMAGE_BASE_URL } from '@/utils/constants';
+import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants';
 import { formatPrice } from '@/utils/formatters';
 import { useOrderTotals } from '@/utils/useOrderTotals';
+import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './CartPage.css'
 
 const CartPage = () => {
@@ -36,7 +37,7 @@ const CartPage = () => {
                         <div className="cart-empty" role="status" aria-live="polite">
                             <img
                                 className="cart-empty__image"
-                                src="/images/empty-cart.webp"
+                                src={`${IMAGE_BASE_URL}empty-cart.webp`}
                                 alt=""
                             />
                             <p className="cart-empty__text">Корзина пуста</p>
@@ -51,7 +52,11 @@ const CartPage = () => {
                             <div className="cart-list">
                                 {cartItems.map((item) => (
                                 <article key={item.id} className="cart-item">
-                                    <img className="cart-item__image" src={`${IMAGE_BASE_URL}${item.image_name}`} alt={item.title} />
+                                    <ImageWithFallback
+                                    className="cart-item__image"
+                                    name={item.image_name}
+                                    fallback={PLACEHOLDER_PRODUCT_IMAGE}
+                                    alt={item.title} />
                                     <div className="cart-item__content">
                                         <h2 className="cart-item__title">{item.title}</h2>
                                         <p className="cart-item__price">{formatPrice(item.price)}</p>

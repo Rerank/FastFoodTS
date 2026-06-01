@@ -2,9 +2,10 @@ import { useState, useEffect, type SubmitEvent } from 'react'
 import { apiService } from '@/api/apiService'
 import { useCart } from '@/context/useCart'
 import type { Product } from '@/types/product';
-import { IMAGE_BASE_URL } from '@/utils/constants'
+import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
+import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import Link from '@/router/Link'
 import './ProductPage.css'
 
@@ -75,7 +76,11 @@ const ProductPage = ({ productId }: { productId: string }) => {
             <main className="product-page">
                 <article className="product-details">
                     <div className="product-details__media">
-                        <img className="product-details__image" src={`${IMAGE_BASE_URL}${product.image_name}`} alt={product.title} />
+                        <ImageWithFallback
+                        className="product-details__image"
+                        name={product.image_name}
+                        fallback={PLACEHOLDER_PRODUCT_IMAGE}
+                        alt={product.title} />
                     </div>
 
                     <div className="product-details__body">

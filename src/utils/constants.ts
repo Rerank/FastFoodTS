@@ -2,6 +2,8 @@ export const IMAGE_BASE_URL = '/images/';
 export const PRODUCTS_PREVIEW_LIMIT = 6;
 export const CURRENCY_SYMBOL = '₽';
 export const TAP_EFFECT_DELAY = 180;
+export const PLACEHOLDER_PRODUCT_IMAGE = 'products.webp';
+export const PLACEHOLDER_AVATAR_IMAGE = 'avatar.webp';
 
 // Флаги активности промоакций
 export const ACTIVE_PROMOTIONS = {

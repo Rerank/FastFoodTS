@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { apiService } from '@/api/apiService'
-import { IMAGE_BASE_URL } from '@/utils/constants'
+import { IMAGE_BASE_URL, PLACEHOLDER_AVATAR_IMAGE } from '@/utils/constants'
 import type { User } from '@/types/user';
 import ProfileSkeleton from './ProfileSkeleton'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
+import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './ProfilePage.css'
 
 const ProfilePage = () => {
@@ -43,7 +44,11 @@ const ProfilePage = () => {
   return (
     <main className="profile-page">
       <section className="profile-hero" aria-labelledby="profile-name">
-        <img className="profile-hero__avatar" src={`${IMAGE_BASE_URL}${user.avatar_file_name}`} alt="Аватар пользователя" />
+        <ImageWithFallback
+        className="profile-hero__avatar"
+        name={user.avatar_file_name}
+        fallback={PLACEHOLDER_AVATAR_IMAGE}
+        alt="Аватар пользователя" />
 
         <div className="profile-hero__content">
           <h2 className="profile-hero__name" id="profile-name">{user.name}</h2>

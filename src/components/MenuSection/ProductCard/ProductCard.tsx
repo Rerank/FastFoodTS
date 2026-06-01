@@ -1,9 +1,10 @@
-import { IMAGE_BASE_URL } from '@/utils/constants'
+import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import type { Product } from '@/types/product';
 import { useState, useRef, type MouseEvent } from 'react'
 import { useCart } from '@/context/useCart'
 import Link from '@/router/Link'
+import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import { TAP_EFFECT_DELAY } from '@/utils/constants'
 import './ProductCard.css'
 
@@ -46,7 +47,11 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <article className="product-card">
-      <img className="product-card__image" src={`${IMAGE_BASE_URL}${image_name}`} alt={title} />
+      <ImageWithFallback
+      className="product-card__image"
+      name={image_name}
+      fallback={PLACEHOLDER_PRODUCT_IMAGE}
+      alt={title} />
       <div className="product-card__body">
         <h3 className="product-card__title">
           <Link to={`/product/${id}`} className="product-card__link" delay={TAP_EFFECT_DELAY}>{title}</Link>
