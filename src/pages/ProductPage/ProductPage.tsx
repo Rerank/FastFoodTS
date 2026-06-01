@@ -2,7 +2,8 @@ import { useState, useEffect, type SubmitEvent } from 'react'
 import { apiService } from '@/api/apiService'
 import { useCart } from '@/context/useCart'
 import type { Product } from '@/types/product';
-import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
+import type { Category } from '@/types/category';
+import { PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
@@ -12,8 +13,9 @@ import './ProductPage.css'
 
 const ProductPage = ({ productId }: { productId: string }) => {
 
-    const [product, setProduct] = useState<Product | null>(null); // Здесь будут данные товара
-    const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
+    const [product, setProduct] = useState<Product | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { addToCart } = useCart();
     const [selectedQuantity, setSelectedQuantity] = useState(1);
     const [isAdded, setIsAdded] = useState(false);
@@ -44,13 +46,19 @@ const ProductPage = ({ productId }: { productId: string }) => {
 
     useEffect(() => {
         const fetchProduct = async () => {
-            const data = await apiService.getProductById(Number(productId));
+            const [productResult, categoriesResult] = await Promise.all([
+                apiService.getProductById(Number(productId)),
+                apiService.getCategories(),
+            ]);
 
-            if (data.error) {
-                setError(data.error);
-            } else {
-                setProduct(data.data);
+            // критична только ошибка товара
+            if (productResult.error || !productResult.data) {
+                setError(productResult.error ?? 'Не удалось загрузить товар');
+                setIsLoading(false);
+                return;
             }
+            setProduct(productResult.data);
+            setCategories(categoriesResult.data ?? []);
             setIsLoading(false);
         }
         fetchProduct();
@@ -65,6 +73,9 @@ const ProductPage = ({ productId }: { productId: string }) => {
         return <div className="app"><main className="product-page">Загрузка...</main></div>;
     }
 
+    // Находим название категории для продукта
+    const categoryTitle = categories.find(c => c.id === product.category_id)?.title ?? '';
+
 
     return (
         <>
@@ -77,15 +88,14 @@ const ProductPage = ({ productId }: { productId: string }) => {
                 <article className="product-details">
                     <div className="product-details__media">
                         <ImageWithFallback
-                        className="product-details__image"
-                        name={product.image_name}
-                        fallback={PLACEHOLDER_PRODUCT_IMAGE}
-                        alt={product.title} />
+                            className="product-details__image"
+                            name={product.image_name}
+                            fallback={PLACEHOLDER_PRODUCT_IMAGE}
+                            alt={product.title} />
                     </div>
 
                     <div className="product-details__body">
-                        {/*Добавить в будущем:*/}
-                        {/*<p className="product-details__category">{product.category_title}</p>*/}
+                        <p className="product-details__category">{categoryTitle}</p>
                         <h1 className="product-details__title">{product.title}</h1>
                         <p className="product-details__description">
                             {product.description}
