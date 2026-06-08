@@ -2,7 +2,7 @@ import type { Category } from '@/types/category';
 import type { Promotion } from '@/types/promotion';
 import type { ProductDto, Product } from '@/types/product';
 import type { User } from '@/types/user';
-const API_BASE_URL = 'http://localhost/projects/fastfoodTS/backend';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export interface ApiResult<T> {
     data: T | null;
@@ -46,16 +46,16 @@ const mapProductToDomain = (dto: ProductDto): Product => {
 
 export const apiService = {
     getCategories: () =>
-        fetchWithErrorHandling<Category[]>(`${API_BASE_URL}/categories.php`, Array.isArray),
+        fetchWithErrorHandling<Category[]>(`${API_BASE_URL}/categories`, Array.isArray),
 
     getPromotions: () =>
-        fetchWithErrorHandling<Promotion[]>(`${API_BASE_URL}/promotions.php`, Array.isArray),
+        fetchWithErrorHandling<Promotion[]>(`${API_BASE_URL}/promotions`, Array.isArray),
 
     getUser: (id: number) =>
-        fetchWithErrorHandling<User>(`${API_BASE_URL}/user.php?id=${id}`, isObject),
+        fetchWithErrorHandling<User>(`${API_BASE_URL}/users/${id}`, isObject),
 
     getProducts: async (): Promise<ApiResult<Product[]>> => {
-        const result = await fetchWithErrorHandling<ProductDto[]>(`${API_BASE_URL}/products.php`, Array.isArray);
+        const result = await fetchWithErrorHandling<ProductDto[]>(`${API_BASE_URL}/products`, Array.isArray);
 
         if (result.error || result.data === null) {
             return { data: null, error: result.error };
@@ -68,7 +68,7 @@ export const apiService = {
     },
 
     getProductById: async (id: number): Promise<ApiResult<Product>> => {
-        const result = await fetchWithErrorHandling<ProductDto>(`${API_BASE_URL}/product.php?id=${id}`, isObject);
+        const result = await fetchWithErrorHandling<ProductDto>(`${API_BASE_URL}/products/${id}`, isObject);
 
         if (result.error || result.data === null) {
             return { data: null, error: result.error };

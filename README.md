@@ -11,21 +11,18 @@
 - **Frontend:** React 19, TypeScript 6 (строгий режим), Vite 8, чистый CSS (BEM).
 - **Роутинг:** собственный мини-роутер на History API (без `react-router`).
 - **Состояние:** локальный `useState`/`useEffect` + Context API для корзины.
-- **Backend:** PHP 8 + MySQL (отдаёт JSON). Перенесён из старого проекта **как есть** — это «клей»,
-  чтобы фронтенд работал; он **не является** учебной частью и не переписывался.
+- **Backend:** отдельный REST API на **Node.js + Express + TypeScript + PostgreSQL** (отдаёт JSON),
+  вынесен в самостоятельный проект; фронтенд обращается к нему по HTTP.
 
 ---
 
 ## 🚀 Запуск (локально)
 
-Нужны **Node.js** и **XAMPP** (Apache + MySQL + PHP).
+Нужен **Node.js**. Бэкенд-API запускается отдельно (см. его README).
 
-1. **База данных.** В phpMyAdmin создать БД `fastfood_db` (`utf8mb4_unicode_ci`), завести таблицы
-   `categories`, `products`, `promotions`, `users` (см. «Модель данных») и наполнить тестовыми данными.
-2. **Backend.** Папка `backend/` лежит в корне; проект должен находиться в `htdocs`
-   (`C:\xampp\htdocs\projects\fastfoodTS`). API доступно по адресу
-   `http://localhost/projects/fastfoodTS/backend/`. Настройки БД — в `backend/db.php`.
-3. **Frontend:**
+1. **Backend.** Поднять API-сервер (Node.js + Express + PostgreSQL) — по умолчанию он слушает
+   `http://localhost:3000`.
+2. **Frontend:**
    ```bash
    npm install
    npm run dev      # дев-сервер Vite → http://localhost:5173
@@ -33,7 +30,8 @@
    npm run lint     # eslint
    ```
 
-Базовый URL API задан в `src/api/apiService.ts` (`API_BASE_URL`).
+Базовый URL API задаётся переменной окружения `VITE_API_BASE_URL` (файл `.env`),
+по умолчанию — `http://localhost:3000/api`.
 
 ---
 
@@ -89,7 +87,7 @@ src/
   единый результат **`ApiResult<T>` = `{ data: T | null; error: string | null }`**.
 - **Три слоя типов товара** (см. `types/product.ts`):
   - `ProductDto` — то, что *реально* приходит с сервера (например, `price` — **строка** `"390.00"`,
-    т.к. это `DECIMAL` в БД);
+    т.к. это `NUMERIC` в БД);
   - `Product` — доменная модель, с которой работает приложение (`price` уже **число**);
   - `ProductWithCategoryTitle` — `Product` + название категории (собирается на клиенте для поиска).
 - Превращение `ProductDto → Product` (в т.ч. `Number(price)`) делает **маппер** в `apiService`.
@@ -113,22 +111,22 @@ Context API: `CartProvider` хранит товары и операции (`addT
 
 ---
 
-## 🗄 Модель данных (MySQL, БД `fastfood_db`)
+## 🗄 Модель данных (PostgreSQL, БД `fastfood_db`)
 
 В БД хранятся только имена файлов картинок (`image_name` / `avatar_file_name`), URL формируется на клиенте.
 
 | Таблица | Поля |
 |---|---|
 | `categories` | `id`, `slug` (для URL), `title`, `sort_order`, `is_active` |
-| `products` | `id`, `category_id` (FK), `title`, `description`, `weight`, `price` (DECIMAL), `image_name`, `is_active` |
+| `products` | `id`, `category_id` (FK), `title`, `description`, `weight`, `price` (NUMERIC), `image_name`, `is_active` |
 | `promotions` | `id`, `type` (CSS-модификатор), `label`, `title`, `description`, `image_name`, `is_active` |
 | `users` | `id`, `name`, `phone`, `avatar_file_name` (nullable), `created_at` |
 
-**Эндпоинты API** (`backend/*.php`, отдают JSON): `categories.php`, `products.php`,
-`promotions.php`, `product.php?id=…`, `user.php?id=…`.
+**Эндпоинты API** (отдают JSON): `GET /api/categories`, `GET /api/products`,
+`GET /api/products/:id`, `GET /api/promotions`, `GET /api/user/:id`.
 
-Важные особенности формата (отражены в типах): `price` приходит **строкой**; `is_active` —
-**числом** `0/1`; `description`, `image_name`, `avatar_file_name` могут быть `null`.
+Важные особенности формата (отражены в типах): `price` приходит **строкой**;
+`description`, `image_name`, `avatar_file_name` могут быть `null`.
 
 ---
 
@@ -136,4 +134,3 @@ Context API: `CartProvider` хранит товары и операции (`addT
 
 - Аутентификации нет: профиль грузится для захардкоженного `id` (`getUser(1)`).
 - Адрес доставки, оплата, кнопка «Заказать» — статичные заглушки в вёрстке.
-- `backend/` — учебный «клей», без валидации/безопасности продакшн-уровня.
