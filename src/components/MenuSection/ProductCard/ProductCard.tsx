@@ -1,4 +1,4 @@
-import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
+import { PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import type { Product } from '@/types/product';
 import { useState, useRef, type MouseEvent } from 'react'
