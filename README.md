@@ -13,25 +13,31 @@
 - **Состояние:** локальный `useState`/`useEffect` + Context API для корзины.
 - **Backend:** отдельный REST API на **Node.js + Express + TypeScript + PostgreSQL** (отдаёт JSON),
   вынесен в самостоятельный проект; фронтенд обращается к нему по HTTP.
+- **Источник данных:** два взаимозаменяемых источника за единым интерфейсом `ApiService` —
+  HTTP-бэкенд или **вшитые моки**; выбор переключается переменной окружения (см. «Запуск»).
+  Моки позволяют публиковать приложение на статическом хостинге (GitHub Pages) без сервера и БД.
 
 ---
 
 ## 🚀 Запуск (локально)
 
-Нужен **Node.js**. Бэкенд-API запускается отдельно (см. его README).
+Нужен **Node.js**. Источник данных переключается переменной `VITE_DATA_SOURCE` в файле `.env`:
 
-1. **Backend.** Поднять API-сервер (Node.js + Express + PostgreSQL) — по умолчанию он слушает
-   `http://localhost:3000`.
-2. **Frontend:**
-   ```bash
-   npm install
-   npm run dev      # дев-сервер Vite → http://localhost:5173
-   npm run build    # tsc -b (проверка типов) + сборка
-   npm run lint     # eslint
-   ```
+- `VITE_DATA_SOURCE=mock` — приложение работает на **вшитых данных** (`src/api/mockData.ts`),
+  бэкенд и БД не нужны. Этот режим используется для деплоя на статический хостинг.
+- любое другое значение (или отсутствие переменной) — данные берутся с **REST-бэкенда** по HTTP.
+  Его нужно поднять отдельно (Node.js + Express + PostgreSQL, по умолчанию слушает
+  `http://localhost:3000`); базовый URL задаётся в `VITE_API_BASE_URL`
+  (по умолчанию `http://localhost:3000/api`).
 
-Базовый URL API задаётся переменной окружения `VITE_API_BASE_URL` (файл `.env`),
-по умолчанию — `http://localhost:3000/api`.
+**Frontend:**
+```bash
+npm install
+npm run dev      # дев-сервер Vite → http://localhost:5173
+npm run build    # tsc -b (проверка типов) + сборка
+npm run lint     # eslint
+npm run preview  # локальный предпросмотр собранного билда
+```
 
 ---
 
@@ -39,8 +45,13 @@
 
 ```text
 src/
-├── api/
-│   └── apiService.ts        # слой работы с API: fetch, валидация, маппинг DTO→домен
+├── api/                     # слой данных за единым интерфейсом ApiService
+│   ├── types.ts             # контракт: интерфейс ApiService + ApiResult<T>
+│   ├── HttpApiService.ts    # реализация: fetch к бэкенду, валидация (unknown + type guards)
+│   ├── MockApiService.ts    # реализация: вшитые данные + имитация сетевой задержки
+│   ├── mockData.ts          # снимок БД (моки в форме DTO) для mock-режима
+│   ├── mappers.ts           # mapProductToDomain — общий маппер DTO→домен
+│   └── apiService.ts        # фабрика: выбор реализации по VITE_DATA_SOURCE
 ├── types/                   # типы предметной области (общий "словарь")
 │   ├── category.ts          # Category
 │   ├── product.ts           # ProductDto (сырой) | Product (домен) | ProductWithCategoryTitle (view)
@@ -81,17 +92,33 @@ src/
   для `/product/:id` достаёт `id` из URL и передаёт в `ProductPage`.
 - Переходы — только через `<Link to="...">` (перехватывает клик) или функцию `navigate('...')`.
 
-### Слой API и типов — главная идея проекта
-Граница «внешний мир → приложение» строго типизирована:
-- `apiService.ts` делает `fetch`, проверяет ответ (`unknown` + type guards) и возвращает
+### Слой данных и типов
+Граница «внешний мир → приложение» строго типизирована и спрятана за **единым контрактом**.
+
+- **Контракт `ApiService`** (`api/types.ts`) описывает методы доступа к данным
+  (`getCategories`, `getProducts`, `getProductById`, `getPromotions`, `getUser`); каждый возвращает
   единый результат **`ApiResult<T>` = `{ data: T | null; error: string | null }`**.
-- **Три слоя типов товара** (см. `types/product.ts`):
-  - `ProductDto` — то, что *реально* приходит с сервера (например, `price` — **строка** `"390.00"`,
-    т.к. это `NUMERIC` в БД);
-  - `Product` — доменная модель, с которой работает приложение (`price` уже **число**);
-  - `ProductWithCategoryTitle` — `Product` + название категории (собирается на клиенте для поиска).
-- Превращение `ProductDto → Product` (в т.ч. `Number(price)`) делает **маппер** в `apiService`.
-  Так «грязь формата» заперта в одном месте, а вся остальная логика работает с чистыми числами.
+- **Две взаимозаменяемые реализации** контракта:
+  - `HttpApiService` — `fetch` к REST-бэкенду, проверка ответа (`unknown` + type guards);
+  - `MockApiService` — отдаёт вшитые данные (`mockData.ts`) с имитацией сетевой задержки.
+- **Фабрика** `apiService.ts` (composition root) выбирает реализацию по `VITE_DATA_SOURCE`
+  и экспортирует её под именем `apiService`. Страницы импортируют только `apiService`
+  и не знают, какой источник под капотом.
+
+Зачем так (SOLID): страницы зависят от **абстракции**, а не от конкретного `fetch`
+(*Dependency Inversion*); новый источник добавляется новой реализацией без правки страниц
+(*Open/Closed*); реализации честно взаимозаменяемы — один контракт, одна форма ответа (*Liskov*).
+По сути это паттерны **Стратегия** (взаимозаменяемые реализации) + **Фабрика** (выбор реализации).
+
+**Три слоя типов товара** (см. `types/product.ts`):
+- `ProductDto` — то, что *реально* приходит с сервера (например, `price` — **строка** `"390.00"`,
+  т.к. это `NUMERIC` в БД); в этой же форме хранятся и моки;
+- `Product` — доменная модель, с которой работает приложение (`price` уже **число**);
+- `ProductWithCategoryTitle` — `Product` + название категории (собирается на клиенте для поиска).
+
+Превращение `ProductDto → Product` (в т.ч. `Number(price)`) делает **общий маппер**
+(`api/mappers.ts`) — им пользуются *обе* реализации. Так «грязь формата» заперта в одном месте,
+а вся остальная логика работает с чистыми числами.
 
 
 ### Состояние корзины
@@ -123,10 +150,13 @@ Context API: `CartProvider` хранит товары и операции (`addT
 | `users` | `id`, `name`, `phone`, `avatar_file_name` (nullable), `created_at` |
 
 **Эндпоинты API** (отдают JSON): `GET /api/categories`, `GET /api/products`,
-`GET /api/products/:id`, `GET /api/promotions`, `GET /api/user/:id`.
+`GET /api/products/:id`, `GET /api/promotions`, `GET /api/users/:id`.
 
 Важные особенности формата (отражены в типах): `price` приходит **строкой**;
 `description`, `image_name`, `avatar_file_name` могут быть `null`.
+
+В **mock-режиме** те же данные отдаёт `src/api/mockData.ts` — это снимок БД в форме DTO
+(те же поля, `price` тоже строкой), поэтому переключение источника не затрагивает остальной код.
 
 ---
 
