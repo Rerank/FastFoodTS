@@ -1,0 +1,88 @@
+.app--skeleton {
+    background: #ffffff;
+}
+
+/* Общий «мерцающий» фон для всех скелетон-примитивов */
+.skeleton-block,
+.skeleton-line,
+.skeleton-pill {
+    background: linear-gradient(90deg, #f1f1f1 0%, #f8f8f8 48%, #f1f1f1 100%);
+    background-size: 220% 100%;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* Шапка: кружок «назад» + строка-заголовок по центру */
+.skeleton-block--back {
+    width: clamp(38px, 10vw, 48px);
+    height: clamp(38px, 10vw, 48px);
+    border-radius: 50%;
+}
+
+.skeleton-line--header-title {
+    justify-self: center;
+    width: min(40vw, 160px);
+}
+
+/* Базовая строка-плейсхолдер */
+.skeleton-line {
+    height: clamp(10px, 2.8vw, 14px);
+    border-radius: 999px;
+}
+
+.skeleton-line--title {
+    width: 70%;
+    height: clamp(30px, 8vw, 44px);
+}
+
+/* Абзац описания — несколько строк подряд */
+.product-skeleton__description {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2.2vw, 11px);
+}
+
+.skeleton-line--text {
+    width: 100%;
+    height: clamp(13px, 3.4vw, 16px);
+}
+
+.skeleton-line--text-short {
+    width: 60%;
+}
+
+.skeleton-line--price {
+    width: 40%;
+    height: clamp(24px, 6.8vw, 34px);
+}
+
+/* «Таблетки» — категория и вес */
+.skeleton-pill {
+    border-radius: 999px;
+}
+
+.skeleton-pill--category {
+    align-self: flex-start;
+    width: clamp(88px, 26vw, 120px);
+    height: clamp(28px, 7.4vw, 34px);
+}
+
+.skeleton-pill--weight {
+    width: clamp(72px, 20vw, 92px);
+    height: clamp(34px, 8.8vw, 40px);
+}
+
+/* Нижний ряд: «количество» и кнопка «в корзину» */
+.skeleton-block--control {
+    min-height: clamp(48px, 12vw, 58px);
+    border-radius: 999px;
+}
+
+@keyframes skeleton-pulse {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}

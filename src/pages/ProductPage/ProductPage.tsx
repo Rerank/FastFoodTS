@@ -8,6 +8,7 @@ import { formatPrice } from '@/utils/formatters'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import Link from '@/router/Link'
+import ProductSkeleton from './ProductSkeleton'
 import './ProductPage.css'
 
 
@@ -68,9 +69,9 @@ const ProductPage = ({ productId }: { productId: string }) => {
         return <div className="app"><main className="product-page"><ErrorState message={error} /></main></div>;
     }
 
-    // Пока данные грузятся, показываем заглушку
+    // Пока данные грузятся, показываем скелетон
     if (isLoading || !product) {
-        return <div className="app"><main className="product-page">Загрузка...</main></div>;
+        return <ProductSkeleton />;
     }
 
     // Находим название категории для продукта

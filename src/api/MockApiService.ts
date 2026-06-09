@@ -10,7 +10,7 @@ const delay = (ms: number) => {
     });
 };
 
-const SIMULATED_DELAY = 300;
+const SIMULATED_DELAY = 200;
 
 
 export const mockApiService: ApiService = {
