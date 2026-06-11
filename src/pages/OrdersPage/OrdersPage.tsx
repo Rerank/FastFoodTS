@@ -39,7 +39,7 @@ const OrdersPage = () => {
             <section className="orders-section" aria-labelledby="orders-title">
                 <div className="orders-section__header">
                     <h1 className="orders-section__title" id="orders-title">Мои заказы</h1>
-                    <span className="orders-section__count">{orders.length} {orders.length} {pluralize(orders.length, ['заказ', 'заказа', 'заказов'])}</span>
+                    <span className="orders-section__count">{orders.length} {pluralize(orders.length, ['заказ', 'заказа', 'заказов'])}</span>
                 </div>
 
                 <div className="orders-list">

@@ -4,6 +4,7 @@ import { IMAGE_BASE_URL, PLACEHOLDER_AVATAR_IMAGE } from '@/utils/constants'
 import type { User } from '@/types/user';
 import ProfileSkeleton from './ProfileSkeleton'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
+import Link from '@/router/Link'
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './ProfilePage.css'
 
@@ -63,7 +64,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="profile-list">
-        <article className="profile-item">
+        <Link to="/orders" className="profile-item">
             <span className="profile-item__icon" aria-hidden="true">
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}orders.svg`} alt="" />
             </span>
@@ -71,7 +72,7 @@ const ProfilePage = () => {
               <p className="profile-item__text">Мои заказы</p>
               <p className="profile-item__meta">Список и статусы заказов</p>
             </div>
-          </article>
+          </Link>
           <article className="profile-item">
             <span className="profile-item__icon" aria-hidden="true">
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}location.svg`} alt="" />

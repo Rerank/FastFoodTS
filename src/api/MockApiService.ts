@@ -50,7 +50,9 @@ export const mockApiService: ApiService = {
 
       getOrders: async (_userId) => {
         await delay(SIMULATED_DELAY);
-        return { data: mockOrders.map(mapOrderToDomain), error: null };
+        const orders = mockOrders.map(mapOrderToDomain);
+        orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return { data: orders, error: null };
 
     }
   };
