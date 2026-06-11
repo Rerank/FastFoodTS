@@ -1,6 +1,6 @@
 import { useCart } from '@/context/useCart';
 import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants';
-import { formatPrice } from '@/utils/formatters';
+import { formatPrice, pluralize } from '@/utils/formatters';
 import { useOrderTotals } from '@/utils/useOrderTotals';
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './CartPage.css'
@@ -46,7 +46,7 @@ const CartPage = () => {
                         <>
                             <div className="cart-section__header">
                                 <h1 className="cart-section__title" id="cart-title">Ваш заказ</h1>
-                                <span className="cart-section__count">{totalItems} товара</span>
+                                <span className="cart-section__count">{totalItems} {pluralize(totalItems, ['товар', 'товара', 'товаров'])}</span>
                             </div>
 
                             <div className="cart-list">

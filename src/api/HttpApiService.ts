@@ -3,7 +3,8 @@ import type { Product, ProductDto } from '@/types/product';
 import type { User } from '@/types/user';
 import type { Category } from '@/types/category';
 import type { Promotion } from '@/types/promotion';
-import { mapProductToDomain } from '@/api/mappers';
+import type { Order, OrderDto } from '@/types/order';
+import { mapProductToDomain, mapOrderToDomain } from '@/api/mappers';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -46,7 +47,7 @@ export const httpApiService: ApiService = {
     getPromotions: () =>
         fetchWithErrorHandling<Promotion[]>(`${API_BASE_URL}/promotions`, Array.isArray),
 
-    getUser: (id: number) =>
+    getUser: (id) =>
         fetchWithErrorHandling<User>(`${API_BASE_URL}/users/${id}`, isObject),
 
     getProducts: async (): Promise<ApiResult<Product[]>> => {
@@ -62,7 +63,7 @@ export const httpApiService: ApiService = {
         };
     },
 
-    getProductById: async (id: number): Promise<ApiResult<Product>> => {
+    getProductById: async (id): Promise<ApiResult<Product>> => {
         const result = await fetchWithErrorHandling<ProductDto>(`${API_BASE_URL}/products/${id}`, isObject);
 
         if (result.error || result.data === null) {
@@ -73,5 +74,19 @@ export const httpApiService: ApiService = {
             data: mapProductToDomain(result.data),
             error: null,
         }
+    },
+
+    getOrders: async (userId): Promise<ApiResult<Order[]>> => {
+        const result = await fetchWithErrorHandling<OrderDto[]>(`${API_BASE_URL}/users/${userId}/orders`, Array.isArray);
+
+        if (result.error || result.data === null) {
+            return { data: null, error: result.error };
+        }
+
+        return {
+            data: result.data.map(mapOrderToDomain),
+            error: null,
+        }
+
     }
 };

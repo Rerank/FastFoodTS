@@ -1,6 +1,6 @@
 import type { ApiService } from '@/api/types';
-import { mockCategories, mockProducts, mockPromotions, mockUsers } from '@/api/mockData';
-import { mapProductToDomain } from '@/api/mappers';
+import { mockCategories, mockProducts, mockPromotions, mockUsers, mockOrders } from '@/api/mockData';
+import { mapProductToDomain, mapOrderToDomain } from '@/api/mappers';
 
 const delay = (ms: number) => {
     return new Promise<void>((resolve) => {
@@ -30,7 +30,6 @@ export const mockApiService: ApiService = {
 
     },
   
-    // самый показательный: поиск + «не найдено» + маппинг DTO→домен
     getProductById: async (id) => {  
       await delay(SIMULATED_DELAY); 
       const result = mockProducts.find(p => p.id === id);
@@ -47,5 +46,11 @@ export const mockApiService: ApiService = {
           return { data: null, error: 'Пользователь не найден' };
         }
         return { data: result, error: null };
-      }
+      },
+
+      getOrders: async (_userId) => {
+        await delay(SIMULATED_DELAY);
+        return { data: mockOrders.map(mapOrderToDomain), error: null };
+
+    }
   };

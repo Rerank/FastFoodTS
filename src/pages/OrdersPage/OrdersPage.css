@@ -1,0 +1,173 @@
+.orders-page {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 5vw, 28px);
+    padding-top: clamp(14px, 4vw, 22px);
+  }
+  
+  .orders-section {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 3.4vw, 18px);
+    margin-top: 30px;
+  }
+  
+  /* Шапка секции: заголовок слева + бейдж с количеством заказов справа. */
+  .orders-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(10px, 3vw, 16px);
+  }
+  
+  .orders-section__title {
+    margin: 0;
+    font-size: clamp(26px, 7vw, 38px);
+    line-height: 1.08;
+  }
+  
+  /* Бейдж-«пилюля» с количеством — повторяет стиль .cart-section__count. */
+  .orders-section__count {
+    flex: 0 0 auto;
+    padding: clamp(6px, 1.8vw, 8px) clamp(12px, 3.4vw, 16px);
+    border-radius: 999px;
+    color: var(--color-primary);
+    background: #fff1e7;
+    font-size: clamp(12px, 3.2vw, 14px);
+    font-weight: 800;
+  }
+  
+  /* Список заказов. */
+  .orders-list {
+    display: grid;
+    gap: var(--fluid-gap);
+  }
+  
+  /* Карточка заказа — единый «карточный» стиль проекта. */
+  .order-card {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 3.4vw, 16px);
+    padding: clamp(14px, 4vw, 20px);
+    border: 1px solid #f1f1f1;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: 0 3px 12px rgba(24, 24, 24, 0.13);
+  }
+  
+  /* Верх карточки: номер + дата заказа слева, статус справа. */
+  .order-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: clamp(10px, 3vw, 16px);
+  }
+  
+  .order-card__number {
+    margin: 0;
+    font-size: clamp(16px, 4.3vw, 20px);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  
+  .order-card__date {
+    margin: clamp(4px, 1.2vw, 6px) 0 0;
+    color: var(--color-muted);
+    font-size: clamp(12px, 3.2vw, 14px);
+    font-weight: 600;
+  }
+  
+  /* ----- Статус заказа ----- */
+  
+  /* Базовый бейдж статуса: «пилюля» с цветной точкой-индикатором. */
+  .order-status {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(5px, 1.6vw, 7px);
+    flex: 0 0 auto;
+    padding: clamp(6px, 1.8vw, 8px) clamp(10px, 3vw, 14px);
+    border-radius: 999px;
+    font-size: clamp(12px, 3.2vw, 14px);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  
+  /* Точка перед текстом статуса наследует цвет текста бейджа (currentColor). */
+  .order-status::before {
+    content: "";
+    width: clamp(7px, 2vw, 9px);
+    height: clamp(7px, 2vw, 9px);
+    border-radius: 50%;
+    background: currentColor;
+  }
+  
+  /* Цветовые варианты статусов: насыщенный цвет текста/точки + светлый фон того же оттенка. */
+  .order-status--preparing {     /* Готовится */
+    color: var(--color-primary);
+    background: #fff1e7;
+  }
+  
+  .order-status--delivering {  /* В пути */
+    color: #2f80ed;
+    background: #e9f1fe;
+  }
+  
+  .order-status--delivered {        /* Доставлен */
+    color: #1e9e57;
+    background: #e7f7ee;
+  }
+  
+  .order-status--cancelled {    /* Отменён */
+    color: #e0524f;
+    background: #fdeceb;
+  }
+  
+  /* Состав заказа: список товаров, отделённый разделителями сверху и снизу. */
+  .order-card__products {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1.4vw, 7px);
+    margin: 0;
+    padding: clamp(12px, 3.4vw, 16px) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    list-style: none;
+  }
+  
+  /* Строка товара: название слева, количество справа. */
+  .order-card__product {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: clamp(10px, 3vw, 16px);
+    color: #444444;
+    font-size: clamp(13px, 3.6vw, 16px);
+    font-weight: 600;
+  }
+  
+  .order-card__product-qty {
+    flex: 0 0 auto;
+    color: var(--color-muted);
+    font-weight: 700;
+  }
+  
+  /* Низ карточки: кол-во товаров слева, сумма справа. */
+  .order-card__bottom {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: clamp(12px, 3.4vw, 18px);
+  }
+  
+  .order-meta__label {
+    color: var(--color-muted);
+    font-size: clamp(12px, 3.2vw, 14px);
+    font-weight: 700;
+  }
+  
+  .order-meta__total {
+    color: var(--color-primary);
+    font-size: clamp(20px, 5.6vw, 28px);
+    font-weight: 900;
+    line-height: 1;
+  }

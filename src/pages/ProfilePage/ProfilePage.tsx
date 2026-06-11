@@ -63,14 +63,22 @@ const ProfilePage = () => {
         </div>
 
         <div className="profile-list">
+        <article className="profile-item">
+            <span className="profile-item__icon" aria-hidden="true">
+              <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}orders.svg`} alt="" />
+            </span>
+            <div className="profile-item__content">
+              <p className="profile-item__text">Мои заказы</p>
+              <p className="profile-item__meta">Список и статусы заказов</p>
+            </div>
+          </article>
           <article className="profile-item">
             <span className="profile-item__icon" aria-hidden="true">
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}location.svg`} alt="" />
             </span>
             <div className="profile-item__content">
-              <h3 className="profile-item__title">Адрес доставки</h3>
-              <p className="profile-item__text">ул. Ленина, 12, кв. 45</p>
-              <p className="profile-item__meta">Подъезд 2, домофон 45</p>
+              <p className="profile-item__text">Адрес доставки</p>
+              <p className="profile-item__meta">ул. Ленина, 12, кв. 45</p>
             </div>
           </article>
 
@@ -79,9 +87,8 @@ const ProfilePage = () => {
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}card.svg`} alt="" />
             </span>
             <div className="profile-item__content">
-              <h3 className="profile-item__title">Карта оплаты</h3>
-              <p className="profile-item__text">Visa •••• 4582</p>
-              <p className="profile-item__meta">Основной способ оплаты</p>
+              <p className="profile-item__text">Карта оплаты</p>
+              <p className="profile-item__meta">Visa •••• 4582</p>
             </div>
           </article>
 
@@ -90,9 +97,8 @@ const ProfilePage = () => {
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}support.svg`} alt="" />
             </span>
             <div className="profile-item__content">
-              <h3 className="profile-item__title">Поддержка</h3>
-              <p className="profile-item__text">Чат с оператором</p>
-              <p className="profile-item__meta">Ответим в течение 5 минут</p>
+              <p className="profile-item__text">Поддержка</p>
+              <p className="profile-item__meta">Чат с оператором</p>
             </div>
           </article>
         </div>

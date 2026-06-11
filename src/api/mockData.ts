@@ -5,6 +5,8 @@ import type { Category } from '@/types/category';
 import type { ProductDto } from '@/types/product';
 import type { Promotion } from '@/types/promotion';
 import type { User } from '@/types/user';
+import type { OrderDto } from '@/types/order';
+
 
 export const mockCategories: Category[] = [
     {
@@ -33,6 +35,7 @@ export const mockCategories: Category[] = [
         title: "Напитки"
     }
 ];
+
 
 export const mockProducts: ProductDto[] = [
     {
@@ -612,3 +615,72 @@ export const mockUsers: User[] = [
         avatar_file_name: "avatar.webp"
     }
 ];
+
+export const mockOrders: OrderDto[] = [
+    {
+        id: 1042,
+        status: 'preparing',
+        total: '1090.00',
+        createdAt: '2026-06-11T11:32:00.000Z',
+        items: [{
+            productId: 1,
+            title: 'Маргарита',
+            quantity: 1,
+            price: '390.00'
+        },
+        {
+            productId: 7,
+            title: 'Классическая',
+            quantity: 1,
+            price: '280.00'
+        },
+        {
+            productId: 29,
+            title: 'Лимонад',
+            quantity: 1,
+            price: '170.00'
+        }
+    ]
+        
+    },
+    {
+        id: 1038,
+        status: 'delivered',
+        total: '1120.00',
+        createdAt: '2026-06-08T16:05:00.000Z',
+        items: [{
+            productId: 2,
+            title: 'Пепперони',
+            quantity: 2,
+            price: '490.00'
+        },
+        {
+            productId: 55,
+            title: 'Кола',
+            quantity: 2,
+            price: '190.00'
+        }
+    ]
+        
+    },
+    {
+        id: 1027,
+        status: 'cancelled',
+        total: '780.00',
+        createdAt: '2026-06-01T10:20:00.000Z',
+        items: [{
+            productId: 25,
+            title: 'Вода',
+            quantity: 2,
+            price: '140.00'
+        },
+        {
+            productId: 13,
+            title: 'Чизбургер',
+            quantity: 1,
+            price: '250.00'
+        }
+    ]
+        
+    }
+]

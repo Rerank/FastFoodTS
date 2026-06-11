@@ -4,6 +4,7 @@ import CartPage from '../pages/CartPage/CartPage'
 import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import ProductPage from '../pages/ProductPage/ProductPage'
+import OrdersPage from '../pages/OrdersPage/OrdersPage'
 
 const Router = () => {
     const [path, setPath] = useState(window.location.pathname)
@@ -27,6 +28,7 @@ const Router = () => {
     if (normalizedPath === '/') return <MenuPage />;
     if (normalizedPath === '/cart') return <CartPage />;
     if (normalizedPath === '/profile') return <ProfilePage />;
+    if (normalizedPath === '/orders') return <OrdersPage />;
 
     if (normalizedPath.startsWith('/product/')) {
         const productId = path.split('/').pop() ?? '';
