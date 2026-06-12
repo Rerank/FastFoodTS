@@ -57,8 +57,8 @@ export const mockApiService: ApiService = {
 
   },
   createOrder: async (_userId, orderPayload) => {
-    await delay(SIMULATED_DELAY);
-    
+    await delay(2000);
+
     const items: OrderItemDto[] = [];
 
     for (const payloadItem of orderPayload.items) {

@@ -1,5 +1,7 @@
 import { useState, type SubmitEvent } from 'react'
 import { useCart } from '@/context/useCart';
+import type { CheckoutStatus } from './CheckoutModal';
+import CheckoutModal from './CheckoutModal';
 import { apiService } from '@/api/apiService';
 import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants';
 import { formatPrice, pluralize } from '@/utils/formatters';
@@ -30,30 +32,31 @@ const CartPage = () => {
         isComboApplied
     } = useOrderTotals(cartItems);
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState<CheckoutStatus>('idle');
+    const [error, setError] = useState<string | null>(null);
 
 
     const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (isSubmitting) return;
+        if (status === 'processing') return;
 
         const orderPayload: CreateOrderPayload = {
             items: cartItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
             total: finalPrice,
         };
 
-        setIsSubmitting(true);
+        setStatus('processing')
 
         const apiResult = await apiService.createOrder(1, orderPayload);
 
         if (apiResult.error) {
-            console.log('Ошибка при создании заказа');
-            setIsSubmitting(false);
+            setError(apiResult.error);
+            setStatus('error');
             return;
         }
 
         clearCart();
-        navigate('/orders');
+        setStatus('success');
 
     };
 
@@ -162,9 +165,19 @@ const CartPage = () => {
                             <span className="cutlery-option__text">Добавить столовые приборы</span>
                         </label>
 
-                        <button className="order-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Отправляем…' : 'Заказать'}</button>
+                        <button className="order-button" type="submit" disabled={status === 'processing'} >{status === 'processing'? 'Отправляем…' : 'Заказать'}</button>
                     </form>
                 ) : null}
+
+                {status !== 'idle' && (
+                    <CheckoutModal
+                        status={status}
+                        errorMessage={error}
+                        onRetry={() => setStatus('idle')}
+                        onViewOrders={() => navigate('/orders')}
+                        onClose={() => setStatus('idle')}
+                    />
+                )}
             </main>
         </div>
     )
