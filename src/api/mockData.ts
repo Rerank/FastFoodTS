@@ -618,32 +618,6 @@ export const mockUsers: User[] = [
 
 export const mockOrders: OrderDto[] = [
     {
-        id: 1042,
-        status: 'preparing',
-        total: '1090.00',
-        createdAt: '2026-06-11T11:32:00.000Z',
-        items: [{
-            productId: 1,
-            title: 'Маргарита',
-            quantity: 1,
-            price: '390.00'
-        },
-        {
-            productId: 7,
-            title: 'Классическая',
-            quantity: 1,
-            price: '280.00'
-        },
-        {
-            productId: 29,
-            title: 'Лимонад',
-            quantity: 1,
-            price: '170.00'
-        }
-    ]
-        
-    },
-    {
         id: 1038,
         status: 'delivered',
         total: '1120.00',

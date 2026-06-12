@@ -49,15 +49,16 @@ src/
 │   ├── types.ts             # контракт: интерфейс ApiService + ApiResult<T>
 │   ├── HttpApiService.ts    # реализация: fetch к бэкенду, валидация (unknown + type guards)
 │   ├── MockApiService.ts    # реализация: вшитые данные + имитация сетевой задержки
-│   ├── mockData.ts          # снимок БД (моки в форме DTO) для mock-режима
-│   ├── mappers.ts           # mapProductToDomain — общий маппер DTO→домен
+│   ├── mockData.ts          # снимок БД (моки в форме DTO) для mock-режима, включая mockOrders
+│   ├── mappers.ts           # mapProductToDomain / mapOrderToDomain — мапперы DTO→домен
 │   └── apiService.ts        # фабрика: выбор реализации по VITE_DATA_SOURCE
 ├── types/                   # типы предметной области (общий "словарь")
 │   ├── category.ts          # Category
 │   ├── product.ts           # ProductDto (сырой) | Product (домен) | ProductWithCategoryTitle (view)
 │   ├── promotion.ts         # Promotion
 │   ├── user.ts              # User
-│   └── cart.ts              # CartItem, CartContextValue
+│   ├── cart.ts              # CartItem, CartContextValue
+│   └── order.ts             # OrderDto/Order, OrderItemDto/OrderItem, OrderStatus, CreateOrderPayload
 ├── router/                  # собственный SPA-роутер
 │   ├── Router.tsx           # сопоставляет URL → страница
 │   ├── Link.tsx             # <a>, перехватывающий клик (без перезагрузки)
@@ -67,7 +68,7 @@ src/
 │   └── CartProvider.tsx     # хранилище и логика корзины
 ├── utils/
 │   ├── constants.ts         # IMAGE_BASE_URL, фичефлаги акций, заглушки картинок и пр.
-│   ├── formatters.ts        # formatPrice()
+│   ├── formatters.ts        # formatPrice(), formatOrderDate(), pluralize(), ORDER_STATUS_LABELS
 │   ├── useOrderTotals.ts    # расчёт итогов заказа (акции, доставка) — пайплайн
 │   └── useDragToScroll.ts   # drag-to-scroll мышью для горизонтальных списков
 ├── components/
@@ -76,8 +77,9 @@ src/
 │   ├── MenuHeader/          # шапка (принимает SearchField как children)
 │   ├── CategoryTabs/        # табы категорий
 │   ├── MenuSection/         # секция товаров + ProductCard
-│   └── PromoCarousel/       # карусель акций + PromoCard
-├── pages/                   # MenuPage, ProductPage, CartPage, ProfilePage, NotFoundPage
+│   ├── PromoCarousel/       # карусель акций + PromoCard
+│   └── OrderCard/           # карточка заказа на странице «Мои заказы»
+├── pages/                   # MenuPage, ProductPage, CartPage (+CheckoutModal), ProfilePage, OrdersPage, NotFoundPage
 ├── App.tsx                  # корень: <CartProvider> вокруг <Router/> и <BottomNav/>
 └── main.tsx                 # точка входа React
 ```
@@ -96,8 +98,9 @@ src/
 Граница «внешний мир → приложение» строго типизирована и спрятана за **единым контрактом**.
 
 - **Контракт `ApiService`** (`api/types.ts`) описывает методы доступа к данным
-  (`getCategories`, `getProducts`, `getProductById`, `getPromotions`, `getUser`); каждый возвращает
-  единый результат **`ApiResult<T>` = `{ data: T | null; error: string | null }`**.
+  (`getCategories`, `getProducts`, `getProductById`, `getPromotions`, `getUser`, `getOrders`,
+  `createOrder`); каждый возвращает единый результат
+  **`ApiResult<T>` = `{ data: T | null; error: string | null }`**.
 - **Две взаимозаменяемые реализации** контракта:
   - `HttpApiService` — `fetch` к REST-бэкенду, проверка ответа (`unknown` + type guards);
   - `MockApiService` — отдаёт вшитые данные (`mockData.ts`) с имитацией сетевой задержки.
@@ -123,8 +126,26 @@ src/
 
 ### Состояние корзины
 Context API: `CartProvider` хранит товары и операции (`addToCart`, `removeFromCart`,
-`updateQuantity`), а компоненты читают их через хук `useCart()`. Хук бросает понятную ошибку,
-если вызван вне `<CartProvider>`. Итоги заказа (скидки, доставка) считает `useOrderTotals()`.
+`updateQuantity`, `clearCart`), а компоненты читают их через хук `useCart()`. Хук бросает понятную
+ошибку, если вызван вне `<CartProvider>`. Итоги заказа (скидки, доставка) считает `useOrderTotals()`.
+
+### Заказы («Мои заказы» + оформление)
+**Изменяемые** данные приложения (категории/товары/акции — статичный снимок).
+- **Чтение** (`getOrders`): страница `OrdersPage` грузит заказы по типовому потоку и рендерит
+  список `OrderCard`; сортировка по дате (свежие сверху) живёт в источнике данных, а не в UI.
+- **Создание** (`createOrder`): кнопка «Заказать» в корзине собирает `CreateOrderPayload`
+  (`items` + `total`) и вызывает контракт; результат показывается в `CheckoutModal`
+  (состояния `processing` / `success` / `error`), при успехе корзина очищается.
+- **Снимок (snapshot):** позиция заказа хранит `title` и `price` на момент покупки — заказ это
+  исторический документ, он не пересчитывается по «живому» каталогу.
+- **Хранилище в mock-режиме:** `createOrder` мутирует модульный массив `mockOrders` (имитация
+  серверной БД за границей `apiService`); данные живут до перезагрузки страницы. React о них не
+  знает — `OrdersPage` просто перезапрашивает их при открытии.
+
+**Доменные слои заказа** (см. `types/order.ts`): `OrderDto`/`OrderItemDto` (с сервера: `total`,
+`price` — строки, `createdAt` — ISO-строка) → `Order`/`OrderItem` (домен: числа и `Date`);
+`OrderStatus` — union (`'preparing' | 'delivered' | 'cancelled'`); `CreateOrderPayload` —
+отдельный «входной» тип запроса (намерение клиента ≠ готовая сущность).
 
 ### Картинки и устойчивость к ошибкам
 - В БД хранятся **только имена файлов**; полный URL собирается на клиенте из `IMAGE_BASE_URL`.
@@ -148,9 +169,15 @@ Context API: `CartProvider` хранит товары и операции (`addT
 | `products` | `id`, `category_id` (FK), `title`, `description`, `weight`, `price` (NUMERIC), `image_name`, `is_active` |
 | `promotions` | `id`, `type` (CSS-модификатор), `label`, `title`, `description`, `image_name`, `is_active` |
 | `users` | `id`, `name`, `phone`, `avatar_file_name` (nullable), `created_at` |
+| `orders` | `id`, `user_id` (FK), `status`, `total` (NUMERIC), `created_at` |
+| `order_items` | `id`, `order_id` (FK), `product_id`, `title`, `price` (NUMERIC), `quantity` |
+
+> Позиции заказа (`order_items`) хранят `title` и `price` как **снимок** на момент покупки,
+> а не ссылку на актуальный товар — заказ это исторический документ.
 
 **Эндпоинты API** (отдают JSON): `GET /api/categories`, `GET /api/products`,
-`GET /api/products/:id`, `GET /api/promotions`, `GET /api/users/:id`.
+`GET /api/products/:id`, `GET /api/promotions`, `GET /api/users/:id`,
+`GET /api/users/:id/orders` (список заказов), `POST /api/users/:id/orders` (создать заказ).
 
 Важные особенности формата (отражены в типах): `price` приходит **строкой**;
 `description`, `image_name`, `avatar_file_name` могут быть `null`.
@@ -162,5 +189,10 @@ Context API: `CartProvider` хранит товары и операции (`addT
 
 ## 📌 Известные упрощения
 
-- Аутентификации нет: профиль грузится для захардкоженного `id` (`getUser(1)`).
-- Адрес доставки, оплата, кнопка «Заказать» — статичные заглушки в вёрстке.
+- Аутентификации нет: профиль и заказы грузятся для захардкоженного `id` (`getUser(1)`,
+  `getOrders(1)`); `userId` передаётся в контракт «на вырост», но mock не фильтрует по нему.
+- Адрес доставки и оплата — статичные заглушки в вёрстке; платёжной системы нет
+  (новый заказ сразу получает статус `preparing`).
+- В mock-режиме `total` приходит с клиента (готовый `finalPrice`); настоящий бэкенд должен
+  пересчитывать сумму сам — `useOrderTotals` это React-хук и на «сервере» недоступен.
+- Заказы в mock-режиме не сохраняются между перезагрузками (живут в памяти модуля).
