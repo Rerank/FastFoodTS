@@ -79,8 +79,7 @@ const applyComboDiscount = (orderState: OrderState): OrderState => {
 // --- Сам хук ---
 
 export const useOrderTotals = (cartItems: CartItem[]) => {
-    // Используем useMemo, чтобы не пересчитывать всё при каждом рендере,
-    // а только когда изменится корзина (cartItems)
+    //useMemo, чтобы не пересчитывать всё при каждом рендере, а только когда изменится корзина (cartItems)
     const totals = useMemo(() => {
         
         // Базовый расчет (без акций)
@@ -114,16 +113,14 @@ export const useOrderTotals = (cartItems: CartItem[]) => {
             orderState = applyFreeDelivery(orderState);
         }
 
-        // Итоговая цена
         const finalPrice = orderState.itemsPrice - orderState.discount + orderState.deliveryCost;
 
-        // Возвращаем всё наружу
         return {
             ...orderState,
             finalPrice
         };
         
-    }, [cartItems]); // Пересчитываем только при изменении cartItems
+    }, [cartItems]);
 
     return totals;
 };

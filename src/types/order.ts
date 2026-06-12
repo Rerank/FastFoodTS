@@ -26,3 +26,12 @@ export interface Order extends Omit<OrderDto, 'total' | 'createdAt' | 'items'> {
     createdAt: Date;
     items: OrderItem[]
 }
+
+
+export interface CreateOrderPayload {
+    items: {
+      productId: number;
+      quantity: number; 
+    }[];
+    total: number; 
+  }

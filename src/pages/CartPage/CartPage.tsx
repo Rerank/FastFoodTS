@@ -1,13 +1,22 @@
+import { useState, type SubmitEvent } from 'react'
 import { useCart } from '@/context/useCart';
+import { apiService } from '@/api/apiService';
 import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants';
 import { formatPrice, pluralize } from '@/utils/formatters';
+import { navigate } from "@/router/navigate";
 import { useOrderTotals } from '@/utils/useOrderTotals';
+import type { CreateOrderPayload } from '@/types/order';
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './CartPage.css'
 
 const CartPage = () => {
 
-    const { cartItems, updateQuantity } = useCart();
+    const {
+        cartItems,
+        updateQuantity,
+        clearCart
+    } = useCart();
+
 
     const {
         totalItems,
@@ -21,6 +30,32 @@ const CartPage = () => {
         isComboApplied
     } = useOrderTotals(cartItems);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+    const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        const orderPayload: CreateOrderPayload = {
+            items: cartItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
+            total: finalPrice,
+        };
+
+        setIsSubmitting(true);
+
+        const apiResult = await apiService.createOrder(1, orderPayload);
+
+        if (apiResult.error) {
+            console.log('Ошибка при создании заказа');
+            setIsSubmitting(false);
+            return;
+        }
+
+        clearCart();
+        navigate('/orders');
+
+    };
 
 
     return (
@@ -51,32 +86,32 @@ const CartPage = () => {
 
                             <div className="cart-list">
                                 {cartItems.map((item) => (
-                                <article key={item.id} className="cart-item">
-                                    <ImageWithFallback
-                                    className="cart-item__image"
-                                    name={item.image_name}
-                                    fallback={PLACEHOLDER_PRODUCT_IMAGE}
-                                    alt={item.title} />
-                                    <div className="cart-item__content">
-                                        <h2 className="cart-item__title">{item.title}</h2>
-                                        <p className="cart-item__price">{formatPrice(item.price)}</p>
-                                    </div>
-                                    <div className="cart-quantity" aria-label="Количество">
-                                        <button
-                                            className="cart-quantity__button tap-effect tap-effect--strong"
-                                            onClick={() => updateQuantity(item.id, -1)}
-                                            type="button"
-                                            aria-label="Уменьшить количество"
-                                        >-</button>
-                                        <span className="cart-quantity__value">{item.quantity}</span>
-                                        <button
-                                            className="cart-quantity__button tap-effect tap-effect--strong"
-                                            onClick={() => updateQuantity(item.id, 1)}
-                                            type="button"
-                                            aria-label="Увеличить количество"
-                                        >+</button>
-                                    </div>
-                                </article>
+                                    <article key={item.id} className="cart-item">
+                                        <ImageWithFallback
+                                            className="cart-item__image"
+                                            name={item.image_name}
+                                            fallback={PLACEHOLDER_PRODUCT_IMAGE}
+                                            alt={item.title} />
+                                        <div className="cart-item__content">
+                                            <h2 className="cart-item__title">{item.title}</h2>
+                                            <p className="cart-item__price">{formatPrice(item.price)}</p>
+                                        </div>
+                                        <div className="cart-quantity" aria-label="Количество">
+                                            <button
+                                                className="cart-quantity__button tap-effect tap-effect--strong"
+                                                onClick={() => updateQuantity(item.id, -1)}
+                                                type="button"
+                                                aria-label="Уменьшить количество"
+                                            >-</button>
+                                            <span className="cart-quantity__value">{item.quantity}</span>
+                                            <button
+                                                className="cart-quantity__button tap-effect tap-effect--strong"
+                                                onClick={() => updateQuantity(item.id, 1)}
+                                                type="button"
+                                                aria-label="Увеличить количество"
+                                            >+</button>
+                                        </div>
+                                    </article>
                                 ))}
                             </div>
                         </>
@@ -84,7 +119,7 @@ const CartPage = () => {
 
                 </section>
                 {cartItems.length > 0 ? (
-                    <form className="cart-summary" action="#" method="post">
+                    <form className="cart-summary" onSubmit={handleSubmit}>
                         <div className="cart-total cart-total--secondary">
                             <span className="cart-total__label">Стоимость товаров</span>
                             <span className="cart-total__price">{formatPrice(itemsPrice)}</span>
@@ -127,7 +162,7 @@ const CartPage = () => {
                             <span className="cutlery-option__text">Добавить столовые приборы</span>
                         </label>
 
-                        <button className="order-button" type="submit">Заказать</button>
+                        <button className="order-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Отправляем…' : 'Заказать'}</button>
                     </form>
                 ) : null}
             </main>

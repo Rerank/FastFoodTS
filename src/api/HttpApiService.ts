@@ -15,10 +15,11 @@ const isObject = (data: unknown): data is Record<string, unknown> => {
 
 const fetchWithErrorHandling = async <T>(
     url: string,
-    validator: (data: unknown) => boolean
+    validator: (data: unknown) => boolean,
+    options?: RequestInit
 ): Promise<ApiResult<T>> => {
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, options);
         if (!response.ok) {
             throw new Error(`Ошибка HTTP: ${response.status}`);
         }
@@ -88,5 +89,25 @@ export const httpApiService: ApiService = {
             error: null,
         }
 
+    },
+    createOrder: async (userId, orderPayload) => {
+        const result = await fetchWithErrorHandling<OrderDto>(
+            `${API_BASE_URL}/users/${userId}/orders`,
+            isObject,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderPayload),
+            }
+        );
+
+        if (result.error || result.data === null) {
+            return { data: null, error: result.error };
+        }
+
+        return {
+            data: mapOrderToDomain(result.data),
+            error: null,
+        }
     }
 };

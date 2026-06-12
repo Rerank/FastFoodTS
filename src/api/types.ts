@@ -2,7 +2,7 @@ import type { Category } from '@/types/category';
 import type { Promotion } from '@/types/promotion';
 import type { Product } from '@/types/product';
 import type { User } from '@/types/user';
-import type { Order } from '@/types/order';
+import type { Order, CreateOrderPayload } from '@/types/order';
 
 export interface ApiResult<T> {
     data: T | null;
@@ -16,4 +16,5 @@ export interface ApiService {
     getPromotions(): Promise<ApiResult<Promotion[]>>;
     getUser(id: number): Promise<ApiResult<User>>;
     getOrders(userId: number): Promise<ApiResult<Order[]>>;
+    createOrder(userId: number, orderPayload: CreateOrderPayload): Promise<ApiResult<Order>>;
   }
