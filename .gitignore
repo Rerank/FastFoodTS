@@ -25,6 +25,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Переменные окружения с секретами
+.env
+
 # Other
 temp
 backend
