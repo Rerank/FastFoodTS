@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, MouseEvent } from "react";
 import { navigate } from "./navigate";
 
-// ComponentPropsWithoutRef<'a'> уже включает children
+
 interface LinkProps extends ComponentPropsWithoutRef<'a'> {
     to: string;
     delay?: number;

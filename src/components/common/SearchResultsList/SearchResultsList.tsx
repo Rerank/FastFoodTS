@@ -6,7 +6,7 @@ import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFa
 const SearchResultsList = ({ results }: { results: ProductWithCategoryTitle[] }) => {
 
     if (!results || results.length === 0) {
-        return null; // Ничего не рендерим, если нет результатов
+        return null;
     }
 
     return (

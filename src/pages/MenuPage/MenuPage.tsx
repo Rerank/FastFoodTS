@@ -27,7 +27,7 @@ const MenuPage = () => {
         apiService.getProducts()
       ]);
 
-      // Если хотя бы один запрос упал, ставим ошибку и прекращаем выполнение
+      
       if (categoriesData.error || productsData.error || !categoriesData.data || !productsData.data) {
         setError(categoriesData.error || productsData.error);
         setIsLoading(false);

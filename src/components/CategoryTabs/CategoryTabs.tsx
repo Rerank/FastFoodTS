@@ -8,8 +8,8 @@ import './CategoryTabs.css'
 
 interface CategoryTabsProps {
   categories: Category[];
-  activeCategory: string | null;                       // slug активной категории или null
-  setActiveCategory: (value: string | null) => void;   // сеттер из useState родителя
+  activeCategory: string | null;                       
+  setActiveCategory: (value: string | null) => void; 
   ref: RefObject<HTMLElement | null>;
 }
 

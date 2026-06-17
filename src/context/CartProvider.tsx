@@ -3,7 +3,7 @@ import { CartContext } from './useCart';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
 
-// { children }: { children: ReactNode } - означает, про объект пропса соответствует объекту, у которого есть поле children типа ReactNode
+
 const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 

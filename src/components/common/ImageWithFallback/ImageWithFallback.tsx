@@ -16,9 +16,9 @@ const ImageWithFallback = ({ name, fallback, ...props }: ImageWithFallbackProps)
 
   return (
     <img
-      {...props}                                       // className, alt и пр. — от вызывающего
+      {...props}     // className, alt и пр. — от вызывающего
       src={`${IMAGE_BASE_URL}${fileName}`}
-      onError={() => setHasError(true)}                // 404 → переключаемся на заглушку
+      onError={() => setHasError(true)}
     />
   );
 };
