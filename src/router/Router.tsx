@@ -5,13 +5,14 @@ import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import ProductPage from '../pages/ProductPage/ProductPage'
 import OrdersPage from '../pages/OrdersPage/OrdersPage'
+import { toAppPath } from './basePath'
 
 const Router = () => {
-    const [path, setPath] = useState(window.location.pathname)
+    const [path, setPath] = useState(toAppPath(window.location.pathname))
 
     useEffect(() => {
         const handlePopState = () => {
-            setPath(window.location.pathname)
+            setPath(toAppPath(window.location.pathname))
         }
 
         window.addEventListener('popstate', handlePopState)
@@ -36,7 +37,6 @@ const Router = () => {
     }
     // Если ни один путь не подошел
     return <NotFoundPage />;
-
 }
 
 export default Router;

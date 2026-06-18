@@ -1,12 +1,12 @@
 import type { ComponentPropsWithoutRef, MouseEvent } from "react";
 import { navigate } from "./navigate";
+import { toBrowserUrl } from "./basePath";
 
 
 interface LinkProps extends ComponentPropsWithoutRef<'a'> {
     to: string;
     delay?: number;
 }
-
 
 const Link = ({ to, children, delay = 0, ...props }: LinkProps) => {
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -24,7 +24,7 @@ const Link = ({ to, children, delay = 0, ...props }: LinkProps) => {
     };
 
     return (
-        <a href={to} onClick={handleClick} {...props}>
+        <a href={toBrowserUrl(to)} onClick={handleClick} {...props}>
             {children}
         </a>
     );

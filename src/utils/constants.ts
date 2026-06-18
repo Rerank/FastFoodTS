@@ -1,4 +1,4 @@
-export const IMAGE_BASE_URL = '/images/';
+export const IMAGE_BASE_URL = `${import.meta.env.BASE_URL}images/`;
 export const PRODUCTS_PREVIEW_LIMIT = 6;
 export const CURRENCY_SYMBOL = '₽';
 export const TAP_EFFECT_DELAY = 180;
