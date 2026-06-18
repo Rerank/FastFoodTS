@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { apiService } from '@/api/apiService'
-import { IMAGE_BASE_URL, PLACEHOLDER_AVATAR_IMAGE } from '@/utils/constants'
+import { IMAGE_BASE_URL, PLACEHOLDER_AVATAR_IMAGE, TAP_EFFECT_DELAY } from '@/utils/constants'
 import type { User } from '@/types/user';
 import ProfileSkeleton from './ProfileSkeleton'
 import ErrorState from '@/components/common/ErrorState/ErrorState';
@@ -64,7 +64,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="profile-list">
-        <Link to="/orders" className="profile-item">
+        <Link to="/orders" className="profile-item tap-effect tap-effect--weak" delay={TAP_EFFECT_DELAY}>
             <span className="profile-item__icon" aria-hidden="true">
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}orders.svg`} alt="" />
             </span>

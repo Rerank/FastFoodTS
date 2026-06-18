@@ -11,7 +11,7 @@ const delay = (ms: number) => {
   });
 };
 
-const SIMULATED_DELAY = 200;
+const SIMULATED_DELAY = 180;
 
 
 export const mockApiService: ApiService = {
@@ -21,7 +21,7 @@ export const mockApiService: ApiService = {
   },
 
   getPromotions: async () => {
-    await delay(SIMULATED_DELAY);
+    await delay(50);
     return { data: mockPromotions, error: null };
   },
 
@@ -57,7 +57,7 @@ export const mockApiService: ApiService = {
 
   },
   createOrder: async (_userId, orderPayload) => {
-    await delay(2000);
+    await delay(1500);
 
     const items: OrderItemDto[] = [];
 
