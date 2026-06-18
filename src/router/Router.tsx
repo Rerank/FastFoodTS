@@ -1,26 +1,13 @@
-import { useState, useEffect } from 'react'
 import MenuPage from '../pages/MenuPage/MenuPage'
 import CartPage from '../pages/CartPage/CartPage'
 import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import ProductPage from '../pages/ProductPage/ProductPage'
 import OrdersPage from '../pages/OrdersPage/OrdersPage'
-import { toAppPath } from './basePath'
+import { useCurrentPath } from './useCurrentPath'
 
 const Router = () => {
-    const [path, setPath] = useState(toAppPath(window.location.pathname))
-
-    useEffect(() => {
-        const handlePopState = () => {
-            setPath(toAppPath(window.location.pathname))
-        }
-
-        window.addEventListener('popstate', handlePopState)
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState)
-        }
-    }, [])
+    const path = useCurrentPath()
 
     const normalizedPath = path.endsWith('/') && path !== '/'
         ? path.slice(0, -1)

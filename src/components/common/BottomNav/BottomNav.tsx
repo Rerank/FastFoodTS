@@ -1,28 +1,17 @@
-import { useState, useEffect } from 'react'
 import Link from '@/router/Link'
+import { useCurrentPath } from '@/router/useCurrentPath'
 import { useCart } from '@/context/useCart'
 import './BottomNav.css'
-const BottomNav = () => {
 
-    const [pathname, setPathname] = useState(window.location.pathname)
+const BottomNav = () => {
+    const pathname = useCurrentPath()
     const { cartItems } = useCart()
 
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
-    useEffect(() => {
-        const handlePopState = () => {
-          setPathname(window.location.pathname)
-        }
-        window.addEventListener('popstate', handlePopState)
-        return () => {
-          window.removeEventListener('popstate', handlePopState)
-        }
-      }, [])
-
-
-      const getNavItemClass = (path: string) => {
+    const getNavItemClass = (path: string) => {
         return `bottom-nav__item ${pathname === path ? 'active' : ''}`
-      }
+    }
 
     return (
         <nav className="bottom-nav" aria-label="Основная навигация">
@@ -35,7 +24,7 @@ const BottomNav = () => {
                 <span className="bottom-nav__label">Меню</span>
             </Link>
             <Link to="/cart" className={getNavItemClass('/cart')} >
-            <div className="bottom-nav__icon-wrapper">
+                <div className="bottom-nav__icon-wrapper">
                     <span className="bottom-nav__icon bottom-nav__icon--cart" aria-hidden="true"></span>
                     {totalItems > 0 && (
                         <span className="bottom-nav__badge">{totalItems}</span>
