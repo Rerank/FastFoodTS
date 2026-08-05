@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
 
@@ -11,4 +11,10 @@ export default defineConfig(({ command }) => ({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  test: {
+    environment: 'jsdom',       // вместо 'node' на бэке
+    clearMocks: true,
+    include: ['src/**/*.test.{ts,tsx}'],   // tsx понадобится для компонентов
+    env: { TZ: 'Europe/Moscow' },
+  }
 }))
