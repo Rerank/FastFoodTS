@@ -59,7 +59,7 @@ describe('formatOrderDate', () => {
         // Arrange
         const orderDate = new Date('2026-07-31T14:30:00');
         // Act
-        const formattedDate: string = formatOrderDate(orderDate)
+        const formattedDate = formatOrderDate(orderDate)
 
         // Assert
         expect(formattedDate).toBe("31 июля, 14:30");

@@ -16,5 +16,6 @@ export default defineConfig(({ command }) => ({
     clearMocks: true,
     include: ['src/**/*.test.{ts,tsx}'],   // tsx понадобится для компонентов
     env: { TZ: 'Europe/Moscow' },
+    setupFiles: ['./src/test/setup.ts'],
   }
 }))
