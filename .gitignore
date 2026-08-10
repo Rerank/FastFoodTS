@@ -28,6 +28,11 @@ dist-ssr
 # Переменные окружения с секретами
 .env
 
+#Playwright
+test-results/
+playwright-report/
+blob-report/
+
 # Other
 temp
 backend

@@ -154,7 +154,7 @@ const CartPage = () => {
                                 {isFreeDelivery ? 'Бесплатно' : `${formatPrice(deliveryCost)}`}
                             </span>
                         </div>
-                        <div className="cart-total">
+                        <div className="cart-total" role="group" aria-label="Итого к оплате">
                             <span className="cart-total__label">Итого</span>
                             <span className="cart-total__price">{formatPrice(finalPrice)}</span>
                         </div>
