@@ -1,15 +1,15 @@
-import './OrdersSkeleton.css'; 
+import './OrdersSkeleton.css';
 
-const OrdersPage = () => {
+const OrdersSkeleton = () => {
   return (
-<main className="orders-page">
-      <section className="orders-section">
+    <main className="orders-page">
+      <section className="orders-section" role="status" aria-label="Загрузка заказов">
         <div className="orders-section__header">
           <div className="skeleton-line skeleton-line--title"></div>
           <div className="skeleton-pill skeleton-pill--count"></div>
         </div>
 
-        <div className="orders-list">
+        <div className="orders-list" aria-hidden="true">
           <article className="order-card">
             <header className="order-card__top">
               <div className="order-card__info">
@@ -97,4 +97,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default OrdersSkeleton;

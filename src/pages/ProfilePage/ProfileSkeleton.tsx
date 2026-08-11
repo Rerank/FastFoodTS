@@ -3,8 +3,8 @@ import './ProfileSkeleton.css';
 const ProfileSkeleton = () => {
     return (
         <>
-            <div className="app app--skeleton" aria-hidden="true">
-                <main className="profile-page">
+            <div className="app app--skeleton" role="status" aria-label="Загрузка профиля">
+                <main className="profile-page" aria-hidden="true">
                     <section className="profile-hero">
                         <div className="profile-hero__avatar skeleton-shape"></div>
 

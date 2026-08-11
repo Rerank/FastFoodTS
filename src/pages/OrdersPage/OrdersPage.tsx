@@ -4,6 +4,7 @@ import { apiService } from '@/api/apiService';
 import type { Order } from '@/types/order';
 import OrdersSkeleton from './OrdersSkeleton'
 import OrderCard from '@/components/OrderCard/OrderCard'
+import ErrorState from '@/components/common/ErrorState/ErrorState';
 import './OrdersPage.css';
 
 const OrdersPage = () => {
@@ -26,7 +27,9 @@ const OrdersPage = () => {
     }, [])
 
     if (error) {
-        return <main className="orders-page">{error}</main>; // позже тут будет ErrorState
+        return <main className="orders-page">
+            <ErrorState message={error} />
+        </main>;
     }
 
     if (isLoading || !orders) {

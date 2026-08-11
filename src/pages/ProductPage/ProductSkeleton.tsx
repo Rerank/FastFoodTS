@@ -7,13 +7,13 @@ import './ProductSkeleton.css';
 // ProductSkeleton.css добавляет только сами «мерцающие» примитивы.
 const ProductSkeleton = () => {
     return (
-        <div className="app app--skeleton" aria-hidden="true">
-            <header className="product-header">
+        <div className="app app--skeleton" role="status" aria-label="Загрузка товара">
+            <header className="product-header" aria-hidden="true">
                 <div className="skeleton-block skeleton-block--back"></div>
                 <div className="skeleton-line skeleton-line--header-title"></div>
             </header>
 
-            <main className="product-page">
+            <main className="product-page" aria-hidden="true">
                 <article className="product-details">
                     <div className="product-details__media">
                         <div className="product-details__image skeleton-block"></div>

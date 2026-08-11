@@ -38,8 +38,7 @@ describe('OrdersPage', () => {
     render(<OrdersPage />);
 
     // Assert
-    // нужно зарефакторить скелетоны, чтобы можно было искать по getByRole, но пока так
-    expect(document.querySelector('.skeleton-line')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.queryByText('Заказ №1')).not.toBeInTheDocument();
 
   });

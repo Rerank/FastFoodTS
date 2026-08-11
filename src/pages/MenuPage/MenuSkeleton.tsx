@@ -3,12 +3,12 @@ import './MenuSkeleton.css';
 const MenuSkeleton = () => {
     return (
         <>
-            <div className="app app--skeleton" aria-hidden="true">
-                <header className="skeleton-header">
+            <div className="app app--skeleton" role="status" aria-label="Загрузка меню">
+                <header className="skeleton-header" aria-hidden="true">
                     <div className="skeleton-search"></div>
                 </header>
 
-                <main className="menu-page menu-page--with-fixed-menu-header">
+                <main className="menu-page menu-page--with-fixed-menu-header" aria-hidden="true">
                     <section className="menu-section">
                         <div className="section-heading">
                             <div className="skeleton-line skeleton-line--title"></div>
