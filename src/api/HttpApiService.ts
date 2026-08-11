@@ -36,6 +36,7 @@ const fetchWithErrorHandling = async <T>(
         }
         return { data: rawData as T, error: null };
     } catch (error) {
+        console.error(error);
         return { data: null, error: 'Не удалось загрузить данные.' };
     }
 };

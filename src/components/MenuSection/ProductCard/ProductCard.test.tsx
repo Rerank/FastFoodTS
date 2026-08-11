@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { CartContext } from '@/context/useCart';
 import type { CartContextValue } from '@/types/cart';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import CartProvider from '@/context/CartProvider';
 import ProductCard from './ProductCard';
 import type { Product } from '@/types/product';
