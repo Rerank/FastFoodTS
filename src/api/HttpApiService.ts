@@ -1,4 +1,4 @@
-import type { ApiResult, ApiService } from '@/api/types';
+import type { ApiError, ApiResult, ApiService } from '@/api/types';
 import type { Product, ProductDto } from '@/types/product';
 import type { User } from '@/types/user';
 import type { Category } from '@/types/category';
@@ -13,32 +13,51 @@ const isObject = (data: unknown): data is Record<string, unknown> => {
     return data !== null && typeof data === 'object' && !Array.isArray(data);
 };
 
+const kindByStatus = (status: number): ApiError['kind'] => {
+    if (status === 401) return 'auth';
+    if (status >= 500) return 'server';
+    return 'client';
+};
+
+
 const fetchWithErrorHandling = async <T>(
     url: string,
     validator: (data: unknown) => boolean,
     options?: RequestInit
 ): Promise<ApiResult<T>> => {
-    try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-        const rawData: unknown = await response.json();
+    const response = await fetch(url, { ...options, credentials: 'include' }).catch(() => null);
 
-        if (validator && !validator(rawData)) {
-            console.error('Неверный формат данных: ', rawData);
-            throw new Error('Неверный формат данных');
-        }
-
-        if (isObject(rawData) && 'error' in rawData) {
-            console.error('Сервер вернул ошибку:', rawData.error);
-            throw new Error(String(rawData.error));
-        }
-        return { data: rawData as T, error: null };
-    } catch (error) {
-        console.error(error);
-        return { data: null, error: 'Не удалось загрузить данные.' };
+    if (response === null) {
+        return { data: null, error: { kind: 'network', status: null, message: 'Нет связи с сервером' } };
     }
+
+    // При logout бэкенд вернёт "204 No Content" — парсить и проверять нечего
+    if (response.status === 204) return { data: null, error: null };
+
+    // если тело распарсить не удалось, то гасим исключение от .json()
+    const rawData: unknown = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        return {
+            data: null,
+            error: {
+                kind: kindByStatus(response.status),
+                status: response.status,
+                message: isObject(rawData) && typeof rawData.error === 'string' ? rawData.error : 'Не удалось загрузить данные.',
+            },
+        };
+    }
+
+    // сервер ответил успехом, но прислал не то
+    if (!validator(rawData)) {
+        console.error('Неверный формат данных: ', rawData);
+        return {
+            data: null,
+            error: { kind: 'server', status: response.status, message: 'Не удалось загрузить данные.' },
+        };
+    }
+
+    return { data: rawData as T, error: null };
 };
 
 
@@ -49,8 +68,26 @@ export const httpApiService: ApiService = {
     getPromotions: () =>
         fetchWithErrorHandling<Promotion[]>(`${API_BASE_URL}/promotions`, Array.isArray),
 
-    getUser: (id) =>
-        fetchWithErrorHandling<User>(`${API_BASE_URL}/users/${id}`, isObject),
+    getCurrentUser: () =>
+        //куки с токеном будут в запросе благодаря credentials: 'include'
+        fetchWithErrorHandling<User>(`${API_BASE_URL}/auth/me`, isObject),
+
+    login: async (phone, password) =>
+        fetchWithErrorHandling<User>(`${API_BASE_URL}/auth/login`, isObject, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password }),
+        }),
+
+    register: async (name, phone, password) =>
+        fetchWithErrorHandling<User>(`${API_BASE_URL}/auth/register`, isObject, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, password }),
+        }),
+
+    logout: () =>
+        fetchWithErrorHandling<null>(`${API_BASE_URL}/auth/logout`, isObject, { method: 'POST' }),
 
     getProducts: async (): Promise<ApiResult<Product[]>> => {
         const result = await fetchWithErrorHandling<ProductDto[]>(`${API_BASE_URL}/products`, Array.isArray);
@@ -78,8 +115,8 @@ export const httpApiService: ApiService = {
         }
     },
 
-    getOrders: async (userId): Promise<ApiResult<Order[]>> => {
-        const result = await fetchWithErrorHandling<OrderDto[]>(`${API_BASE_URL}/users/${userId}/orders`, Array.isArray);
+    getOrders: async (): Promise<ApiResult<Order[]>> => {
+        const result = await fetchWithErrorHandling<OrderDto[]>(`${API_BASE_URL}/orders`, Array.isArray);
 
         if (result.error || result.data === null) {
             return { data: null, error: result.error };
@@ -91,9 +128,9 @@ export const httpApiService: ApiService = {
         }
 
     },
-    createOrder: async (userId, orderPayload) => {
+    createOrder: async (orderPayload) => {
         const result = await fetchWithErrorHandling<OrderDto>(
-            `${API_BASE_URL}/users/${userId}/orders`,
+            `${API_BASE_URL}/orders`,
             isObject,
             {
                 method: 'POST',

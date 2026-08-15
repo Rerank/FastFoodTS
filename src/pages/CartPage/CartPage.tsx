@@ -47,10 +47,10 @@ const CartPage = () => {
 
         setStatus('processing')
 
-        const apiResult = await apiService.createOrder(1, orderPayload);
+        const apiResult = await apiService.createOrder(orderPayload);
 
         if (apiResult.error) {
-            setError(apiResult.error);
+            setError(apiResult.error.message);
             setStatus('error');
             return;
         }

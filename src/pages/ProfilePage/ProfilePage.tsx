@@ -15,10 +15,10 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const apiResult = await apiService.getUser(1);
+      const apiResult = await apiService.getCurrentUser();
 
       if (apiResult.error) {
-        setError(apiResult.error);
+        setError(apiResult.error.message);
       } else {
         setUser(apiResult.data);
       }

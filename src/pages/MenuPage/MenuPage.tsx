@@ -27,15 +27,17 @@ const MenuPage = () => {
         apiService.getProducts()
       ]);
 
-      
-      if (categoriesData.error || productsData.error || !categoriesData.data || !productsData.data) {
-        setError(categoriesData.error || productsData.error);
+      // сохраняем перввую из двух ошибок (если нет, то будет null)
+      const requestError = categoriesData.error ?? productsData.error;
+      // проверки data нужны для дальнейшего кода, чтобы сузить тип
+      if (requestError || !categoriesData.data || !productsData.data) {
+        setError(requestError?.message ?? 'Не удалось загрузить данные.');
         setIsLoading(false);
         return;
       }
 
       // Выносим данные в отдельные переменные, т.к. TS не видит предыдущее сужение типа внутри map
-      const loadedCategories = categoriesData.data; 
+      const loadedCategories = categoriesData.data;
       const loadedProducts = productsData.data;
 
       setCategories(loadedCategories);

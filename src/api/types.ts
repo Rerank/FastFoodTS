@@ -4,9 +4,15 @@ import type { Product } from '@/types/product';
 import type { User } from '@/types/user';
 import type { Order, CreateOrderPayload } from '@/types/order';
 
+export type ApiError = {
+    kind: 'auth' | 'client' | 'server' | 'network';
+    status: number | null;
+    message: string;
+};
+
 export interface ApiResult<T> {
     data: T | null;
-    error: string | null;
+    error: ApiError | null;
 }
 
 export interface ApiService {
@@ -14,7 +20,14 @@ export interface ApiService {
     getProducts(): Promise<ApiResult<Product[]>>;
     getProductById(id: number): Promise<ApiResult<Product>>;
     getPromotions(): Promise<ApiResult<Promotion[]>>;
-    getUser(id: number): Promise<ApiResult<User>>;
-    getOrders(userId: number): Promise<ApiResult<Order[]>>;
-    createOrder(userId: number, orderPayload: CreateOrderPayload): Promise<ApiResult<Order>>;
-  }
+
+    getCurrentUser(): Promise<ApiResult<User>>;
+    register(name: string, phone: string, password: string): Promise<ApiResult<User>>;
+    login(phone: string, password: string): Promise<ApiResult<User>>;
+    logout(): Promise<ApiResult<null>>;
+
+    getOrders(): Promise<ApiResult<Order[]>>;
+    createOrder(orderPayload: CreateOrderPayload): Promise<ApiResult<Order>>;
+}
+
+  

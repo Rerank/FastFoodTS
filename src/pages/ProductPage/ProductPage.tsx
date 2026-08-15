@@ -54,7 +54,7 @@ const ProductPage = ({ productId }: { productId: string }) => {
 
             // критична только ошибка товара
             if (productResult.error || !productResult.data) {
-                setError(productResult.error ?? 'Не удалось загрузить товар');
+                setError(productResult.error?.message ?? 'Не удалось загрузить товар');
                 setIsLoading(false);
                 return;
             }

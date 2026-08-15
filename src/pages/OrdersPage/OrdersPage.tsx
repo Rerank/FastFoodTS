@@ -14,10 +14,10 @@ const OrdersPage = () => {
 
     useEffect(() => {
         const fetchOrders = async () => {
-            const apiResult = await apiService.getOrders(1);
+            const apiResult = await apiService.getOrders();
 
             if (apiResult.error) {
-                setError(apiResult.error);
+                setError(apiResult.error.message);
             } else {
                 setOrders(apiResult.data);
             }
