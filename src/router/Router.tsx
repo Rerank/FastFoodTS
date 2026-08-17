@@ -4,7 +4,13 @@ import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import ProductPage from '../pages/ProductPage/ProductPage'
 import OrdersPage from '../pages/OrdersPage/OrdersPage'
+import Protected from './Protected'
+import LoginPage from '@/pages/Auth/LoginPage'
+import ProfileSkeleton from '@/pages/ProfilePage/ProfileSkeleton'
+import OrdersSkeleton from '@/pages/OrdersPage/OrdersSkeleton'
 import { useCurrentPath } from './useCurrentPath'
+import { navigate } from './navigate'
+
 
 const Router = () => {
     const path = useCurrentPath()
@@ -15,8 +21,9 @@ const Router = () => {
 
     if (normalizedPath === '/') return <MenuPage />;
     if (normalizedPath === '/cart') return <CartPage />;
-    if (normalizedPath === '/profile') return <ProfilePage />;
-    if (normalizedPath === '/orders') return <OrdersPage />;
+    if (normalizedPath === '/login') return <LoginPage onSuccess={() => navigate('/')} />;
+    if (normalizedPath === '/profile') return <Protected fallback={<ProfileSkeleton />}><ProfilePage /></Protected>;
+    if (normalizedPath === '/orders') return <Protected fallback={<OrdersSkeleton />}><OrdersPage /></Protected>;
 
     if (normalizedPath.startsWith('/product/')) {
         const productId = path.split('/').pop() ?? '';

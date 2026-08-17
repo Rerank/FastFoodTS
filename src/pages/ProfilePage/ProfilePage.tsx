@@ -1,55 +1,24 @@
-import { useState, useEffect } from 'react'
-import { apiService } from '@/api/apiService'
 import { IMAGE_BASE_URL, PLACEHOLDER_AVATAR_IMAGE, TAP_EFFECT_DELAY } from '@/utils/constants'
-import type { User } from '@/types/user';
-import ProfileSkeleton from './ProfileSkeleton'
-import ErrorState from '@/components/common/ErrorState/ErrorState';
+import { useAuth } from '@/context/useAuth'
 import Link from '@/router/Link'
+import { navigate } from '@/router/navigate'
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
 import './ProfilePage.css'
 
 const ProfilePage = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const apiResult = await apiService.getCurrentUser();
-
-      if (apiResult.error) {
-        setError(apiResult.error.message);
-      } else {
-        setUser(apiResult.data);
-      }
-      setIsLoading(false);
-    }
-
-    fetchUser();
-  }, []);
-
-
-  if (error) {
-    return (
-      <main className="profile-page">
-        <ErrorState message={error} />
-      </main>
-    );
-  }
-
-  if (isLoading|| !user) {
-    return <ProfileSkeleton />;
-  }
+  if (!user) return null;
 
 
   return (
     <main className="profile-page">
       <section className="profile-hero" aria-labelledby="profile-name">
         <ImageWithFallback
-        className="profile-hero__avatar"
-        name={user.avatar_file_name}
-        fallback={PLACEHOLDER_AVATAR_IMAGE}
-        alt="Аватар пользователя" />
+          className="profile-hero__avatar"
+          name={user.avatar_file_name}
+          fallback={PLACEHOLDER_AVATAR_IMAGE}
+          alt="Аватар пользователя" />
 
         <div className="profile-hero__content">
           <h2 className="profile-hero__name" id="profile-name">{user.name}</h2>
@@ -64,7 +33,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="profile-list">
-        <Link to="/orders" className="profile-item tap-effect tap-effect--weak" delay={TAP_EFFECT_DELAY}>
+          <Link to="/orders" className="profile-item tap-effect tap-effect--weak" delay={TAP_EFFECT_DELAY}>
             <span className="profile-item__icon" aria-hidden="true">
               <img className="profile-item__icon-image" src={`${IMAGE_BASE_URL}orders.svg`} alt="" />
             </span>
@@ -104,6 +73,8 @@ const ProfilePage = () => {
           </article>
         </div>
       </section>
+
+      <button className="profile-logout" type="button" onClick={async () => { await logout(); navigate('/login'); }}>Выйти</button>
 
     </main>
   )

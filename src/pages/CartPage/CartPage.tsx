@@ -1,5 +1,7 @@
 import { useState, type SubmitEvent } from 'react'
 import { useCart } from '@/context/useCart';
+import { useAuth } from '@/context/useAuth';
+import LoginPage from '@/pages/Auth/LoginPage'
 import type { CheckoutStatus } from './CheckoutModal';
 import CheckoutModal from './CheckoutModal';
 import { apiService } from '@/api/apiService';
@@ -19,6 +21,7 @@ const CartPage = () => {
         clearCart
     } = useCart();
 
+    const { status: authStatus } = useAuth();
 
     const {
         totalItems,
@@ -32,12 +35,20 @@ const CartPage = () => {
         isComboApplied
     } = useOrderTotals(cartItems);
 
+
     const [status, setStatus] = useState<CheckoutStatus>('idle');
     const [error, setError] = useState<string | null>(null);
+    const [needsAuth, setNeedsAuth] = useState(false);
 
 
     const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (authStatus !== 'authenticated') {
+            setNeedsAuth(true);
+            return;
+        }
+
         if (status === 'processing') return;
 
         const orderPayload: CreateOrderPayload = {
@@ -60,6 +71,7 @@ const CartPage = () => {
 
     };
 
+    if (needsAuth) return <LoginPage onSuccess={() => setNeedsAuth(false)} />;
 
     return (
 
@@ -165,7 +177,7 @@ const CartPage = () => {
                             <span className="cutlery-option__text">Добавить столовые приборы</span>
                         </label>
 
-                        <button className="order-button" type="submit" disabled={status === 'processing'} >{status === 'processing'? 'Отправляем…' : 'Заказать'}</button>
+                        <button className="order-button" type="submit" disabled={status === 'processing'} >{status === 'processing' ? 'Отправляем…' : 'Заказать'}</button>
                     </form>
                 ) : null}
 

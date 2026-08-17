@@ -5,6 +5,7 @@
   --color-muted: #929292;
   --color-border: #eeeeee;
   --color-primary: #f68330;
+  --color-danger: #d92d20;
   --app-max-width: 580px;
   --app-inline-padding: clamp(12px, 4vw, 24px);
   --app-block-padding: clamp(12px, 3vw, 20px);
