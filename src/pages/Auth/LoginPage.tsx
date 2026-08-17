@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { useAuth } from '@/context/useAuth';
+import { IS_DEMO } from '@/api/apiService';
 import Link from '@/router/Link'
 import './auth.css'
 
@@ -47,6 +48,11 @@ const LoginPage = ({ onSuccess }: { onSuccess?: () => void }) => {
             <main className="auth-page">
                 <header className="auth-header">
                     <h1 className="auth-header__title">Войдите, чтобы оформить заказ</h1>
+                    {IS_DEMO && (
+                        <p className="auth-header__subtitle">
+                            Демо-режим: сервера нет, подойдут любые телефон и пароль
+                        </p>
+                    )}
                 </header>
 
                 <form className="auth-form" onSubmit={handleSubmit}>
@@ -100,8 +106,8 @@ const LoginPage = ({ onSuccess }: { onSuccess?: () => void }) => {
                 </form>
 
                 <p className="auth-switch">
-                    Нет аккаунта?
-                    <Link to="/register" className="auth-switch__link">Зарегистрироваться</Link>
+                    Нет аккаунта? 
+                    <Link to="/register" className="auth-switch__link"> Зарегистрироваться</Link>
                 </p>
             </main>
         </>

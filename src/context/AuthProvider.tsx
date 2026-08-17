@@ -21,14 +21,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setStatus('authenticated');
                 return;
             }
-            
+
             // если сбой не связан с аутентификацией
             if (result.error && result.error.kind !== 'auth') {
                 setError(result.error);
                 setStatus('unavailable');
                 return;
             }
-            
+
             setStatus('guest');
         };
 
@@ -48,17 +48,31 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null; //успешный вход
     };
 
+    const register = async (name: string, phone: string, password: string): Promise<ApiError | null> => {
+        const result = await apiService.register(name, phone, password);
+
+        // возвращаем ошибку форме
+        if (!result.data) {
+            return result.error;
+        }
+
+        setUser(result.data);
+        setStatus('authenticated');
+        return null; //успешный вход
+
+    };
+
     const logout = async () => {
         setUser(null);
         setStatus('guest');
-        
+
         // Результат намеренно игнорируем: из аккаунта надо выйти в любом случае
         await apiService.logout();
-        
+
     };
 
     return (
-        <AuthContext.Provider value={{ status, user, error, login, logout }}>
+        <AuthContext.Provider value={{ status, user, error, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

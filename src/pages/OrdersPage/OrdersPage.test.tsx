@@ -45,7 +45,10 @@ describe('OrdersPage', () => {
 
   it('показывает сообщение об ошибке, если не удалось загрузить', async () => {
     // Arrange
-    vi.mocked(apiService.getOrders).mockResolvedValue({ data: null, error: 'Не удалось загрузить данные.' });
+    vi.mocked(apiService.getOrders).mockResolvedValue({
+      data: null,
+      error: { kind: 'server', status: 500, message: 'Не удалось загрузить данные.' },
+    });
 
     // Act
     render(<OrdersPage />);

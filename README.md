@@ -12,7 +12,9 @@
 
 - **Frontend:** React 19, TypeScript 6 (строгий режим), Vite 8, чистый CSS (BEM).
 - **Роутинг:** собственный мини-роутер на History API (без `react-router`).
-- **Состояние:** локальный `useState`/`useEffect` + Context API для корзины.
+- **Состояние:** локальный `useState`/`useEffect` + Context API (корзина и авторизация).
+- **Аутентификация:** вход по телефону и паролю; токен живёт в `httpOnly`-куке, которую ставит
+  бэкенд, — клиентский JavaScript его не видит (см. «Аутентификация»).
 - **Backend:** отдельный REST API на **Node.js + Express + TypeScript + PostgreSQL** (отдаёт JSON),
   вынесен в самостоятельный проект; фронтенд обращается к нему по HTTP.
 - **Источник данных:** два взаимозаменяемых источника за единым интерфейсом `ApiService` —
@@ -92,23 +94,27 @@ src/
 │   ├── MockApiService.ts    # реализация: вшитые данные + имитация сетевой задержки
 │   ├── mockData.ts          # снимок БД (моки в форме DTO) для mock-режима, включая mockOrders
 │   ├── mappers.ts           # mapProductToDomain / mapOrderToDomain — мапперы DTO→домен
-│   └── apiService.ts        # фабрика: выбор реализации по VITE_DATA_SOURCE
+│   └── apiService.ts        # фабрика: выбор реализации по VITE_DATA_SOURCE + флаг IS_DEMO
 ├── types/                   # типы предметной области (общий "словарь")
 │   ├── category.ts          # Category
 │   ├── product.ts           # ProductDto (сырой) | Product (домен) | ProductWithCategoryTitle (view)
 │   ├── promotion.ts         # Promotion
 │   ├── user.ts              # User
+│   ├── auth.ts              # AuthStatus, AuthContextValue
 │   ├── cart.ts              # CartItem, CartContextValue
 │   └── order.ts             # OrderDto/Order, OrderItemDto/OrderItem, OrderStatus, CreateOrderPayload
 ├── router/                  # собственный SPA-роутер
 │   ├── Router.tsx           # сопоставляет URL → страница
+│   ├── Protected.tsx        # обёртка: пускает на страницу только вошедших
 │   ├── Link.tsx             # <a>, перехватывающий клик (без перезагрузки)
 │   ├── navigate.ts          # программный переход
 │   ├── basePath.ts          # учёт base-пути (подпапки) при деплое на GitHub Pages
 │   └── useCurrentPath.ts    # хук: текущий путь (с учётом base), общий для Router и BottomNav
-├── context/                 # корзина через Context API
+├── context/                 # корзина и авторизация через Context API
 │   ├── useCart.ts           # CartContext + хук useCart()
-│   └── CartProvider.tsx     # хранилище и логика корзины
+│   ├── CartProvider.tsx     # хранилище и логика корзины
+│   ├── useAuth.ts           # AuthContext + хук useAuth()
+│   └── AuthProvider.tsx     # кто вошёл: проверка сессии при старте, login/register/logout
 ├── utils/
 │   ├── constants.ts         # IMAGE_BASE_URL, фичефлаги акций, заглушки картинок и пр.
 │   ├── formatters.ts        # formatPrice(), formatOrderDate(), pluralize(), ORDER_STATUS_LABELS
@@ -125,8 +131,9 @@ src/
 │   ├── PromoCarousel/       # карусель акций + PromoCard
 │   └── OrderCard/           # карточка заказа на странице «Мои заказы»
 ├── pages/                   # MenuPage, ProductPage, CartPage (+CheckoutModal), ProfilePage, OrdersPage, NotFoundPage
+│   └── Auth/                # LoginPage, RegisterPage и общий auth.css
 ├── test/setup.ts            # общая настройка Vitest: матчеры jest-dom + cleanup
-├── App.tsx                  # корень: <CartProvider> вокруг <Router/> и <BottomNav/>
+├── App.tsx                  # корень: <AuthProvider> и <CartProvider> вокруг <Router/> и <BottomNav/>
 └── main.tsx                 # точка входа React
 
 e2e/                         # E2E-тесты Playwright: свой раннер, отдельная команда
@@ -157,9 +164,14 @@ playwright.config.ts         # E2E: testDir, baseURL, авто-запуск dev-
 Граница «внешний мир → приложение» строго типизирована и спрятана за **единым контрактом**.
 
 - **Контракт `ApiService`** (`api/types.ts`) описывает методы доступа к данным
-  (`getCategories`, `getProducts`, `getProductById`, `getPromotions`, `getUser`, `getOrders`,
-  `createOrder`); каждый возвращает единый результат
-  **`ApiResult<T>` = `{ data: T | null; error: string | null }`**.
+  (`getCategories`, `getProducts`, `getProductById`, `getPromotions`, `getCurrentUser`,
+  `login`, `register`, `logout`, `getOrders`, `createOrder`); каждый возвращает единый результат
+  **`ApiResult<T>` = `{ data: T | null; error: ApiError | null }`**.
+- **`ApiError`** — не строка, а объект `{ kind, status, message }`, где
+  `kind: 'auth' | 'client' | 'server' | 'network'`. Одного текста не хватает: ответ `401` на
+  «кто я» означает «покажи форму входа», а сетевой сбой — «сервер недоступен», и приложению
+  нужно различать их **до** показа чего-либо пользователю. `status` равен `null`, если запрос
+  не состоялся вовсе. `message` берётся из тела ответа сервера, если он его прислал.
 - **Две взаимозаменяемые реализации** контракта:
   - `HttpApiService` — `fetch` к REST-бэкенду, проверка ответа (`unknown` + type guards);
   - `MockApiService` — отдаёт вшитые данные (`mockData.ts`) с имитацией сетевой задержки.
@@ -187,6 +199,54 @@ playwright.config.ts         # E2E: testDir, baseURL, авто-запуск dev-
 Context API: `CartProvider` хранит товары и операции (`addToCart`, `removeFromCart`,
 `updateQuantity`, `clearCart`), а компоненты читают их через хук `useCart()`. Хук бросает понятную
 ошибку, если вызван вне `<CartProvider>`. Итоги заказа (скидки, доставка) считает `useOrderTotals()`.
+
+### Аутентификация
+
+Тот же приём, что и с корзиной: «кто сейчас вошёл» — общий факт, нужный многим местам сразу,
+поэтому он живёт в `AuthProvider`, а компоненты берут его через `useAuth()`.
+
+**Токен клиенту недоступен.** Бэкенд кладёт JWT в `httpOnly`-куку — так его не украдёт скрипт
+при XSS. Отсюда три следствия, определившие устройство фронтенда:
+
+- приложение **не может прочитать** токен, поэтому при каждом запуске спрашивает у сервера
+  `GET /api/auth/me` — иначе после F5 оно не знает, вошёл ли пользователь;
+- приложение **не может удалить** куку, поэтому выход — это запрос `POST /api/auth/logout`;
+- `fetch` по умолчанию не шлёт куки на другой origin, поэтому в `HttpApiService` у всех запросов
+  стоит `credentials: 'include'` (парный к `credentials: true` в CORS на бэкенде).
+
+**Четыре состояния вместо двух.** `AuthStatus` — это `'loading' | 'authenticated' | 'guest' |
+'unavailable'`. Двух значений не хватает по двум разным причинам:
+
+- пока ответ `/me` не пришёл, ответа **нет**. Если считать это состояние гостевым, залогиненный
+  пользователь при каждой перезагрузке увидит вспышку формы входа;
+- если `/me` ответил не `401`, а сбоем (`500`, нет сети), мы **не знаем**, вошёл он или нет.
+  Записать его в гости — значит сказать неправду: человеку покажут форму входа, хотя его сессия
+  цела. Поэтому такой исход отделён и показывает `ErrorState` с кнопкой перезагрузки.
+
+Оба случая — про одно: не путать «нет» с «не знаю».
+
+**Защита страниц.** Обёртка `Protected` (`router/Protected.tsx`) стоит между роутером и страницей
+и по статусу решает, что показать: скелетон (`loading`), `ErrorState` (`unavailable`),
+форму входа (`guest`) или саму страницу. Обёрнуты только `/profile` и `/orders` — те, что
+защищены на сервере; каталог и корзина открыты всем.
+
+Форма рисуется **на месте, без редиректа**: адрес остаётся `/orders`, поэтому после входа человек
+сразу видит то, за чем шёл, и не нужно запоминать, куда его вернуть.
+
+**Защита действия, а не страницы.** Корзина — исключение: набирать товары гость может, а вот
+оформление заказа зовёт защищённый эндпоинт. Поэтому `CartPage` проверяет статус в обработчике
+отправки и показывает форму входа вместо запроса; товары при этом целы — они в `CartProvider`,
+а не в странице.
+
+**Почему `login`/`logout` есть и в `apiService`, и в контексте.** Это разные слои:
+`apiService.login` разговаривает с сервером, `useAuth().login` дополнительно обновляет состояние
+приложения. Позови форма первый напрямую — кука бы установилась, но интерфейс остался бы
+гостевым и продолжил показывать форму входа.
+
+**В демо-режиме** сервера нет: `MockApiService` держит текущего пользователя в переменной модуля
+и стартует «уже вошедшим», чтобы GitHub Pages открывался без регистрации. Отличия от настоящего
+бэкенда — в разделе «Известные упрощения»; на формах они подписаны прямо в интерфейсе
+(флаг `IS_DEMO` из `api/apiService.ts`).
 
 ### Заказы («Мои заказы» + оформление)
 **Изменяемые** данные приложения (категории/товары/акции — статичный снимок).
@@ -216,6 +276,13 @@ Context API: `CartProvider` хранит товары и операции (`addT
 `useEffect` → вызов `apiService.getX()` → проверка `result.error` / `result.data` →
 запись в `useState` → рендер (скелетон во время загрузки, `ErrorState` при ошибке, данные при успехе).
 
+Проверять надо именно `result.data`: она сужает тип до непустого, тогда как проверка `error`
+этого не делает. Для показа пользователю берётся `error.message`.
+
+`ProfilePage` из этого потока выпадает — она ничего не запрашивает, а берёт пользователя из
+контекста. Ожидание и ошибку за неё обрабатывает `Protected`, поэтому ни скелетона, ни
+`ErrorState` внутри страницы нет: **обработка ошибки живёт там, где живёт запрос**.
+
 ---
 
 ## 🗄 Модель данных (PostgreSQL, БД `fastfood_db`)
@@ -227,16 +294,23 @@ Context API: `CartProvider` хранит товары и операции (`addT
 | `categories` | `id`, `slug` (для URL), `title`, `sort_order`, `is_active` |
 | `products` | `id`, `category_id` (FK), `title`, `description`, `weight`, `price` (NUMERIC), `image_name`, `is_active` |
 | `promotions` | `id`, `type` (CSS-модификатор), `label`, `title`, `description`, `image_name`, `is_active` |
-| `users` | `id`, `name`, `phone`, `avatar_file_name` (nullable), `created_at` |
+| `users` | `id`, `name`, `phone` (UNIQUE, служит логином), `avatar_file_name` (nullable), `password_hash`, `created_at` |
 | `orders` | `id`, `user_id` (FK), `status`, `total` (NUMERIC), `created_at` |
 | `order_items` | `id`, `order_id` (FK), `product_id`, `title`, `price` (NUMERIC), `quantity` |
 
 > Позиции заказа (`order_items`) хранят `title` и `price` как **снимок** на момент покупки,
 > а не ссылку на актуальный товар — заказ это исторический документ.
 
-**Эндпоинты API** (отдают JSON): `GET /api/categories`, `GET /api/products`,
-`GET /api/products/:id`, `GET /api/promotions`, `GET /api/users/:id`,
-`GET /api/users/:id/orders` (список заказов), `POST /api/users/:id/orders` (создать заказ).
+**Эндпоинты API** (отдают JSON):
+
+| Открытые | Требуют куку |
+|---|---|
+| `GET /api/categories`, `GET /api/products`, `GET /api/products/:id`, `GET /api/promotions` | `GET /api/auth/me` |
+| `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout` | `GET /api/orders`, `POST /api/orders` |
+
+Идентификатор пользователя в адресах **отсутствует**: заказы живут по `/api/orders`, а владельца
+сервер берёт из токена. Подставить чужой номер технически некуда — раньше на его месте было
+`/api/users/:id/orders`, и это была дыра (IDOR). Без куки защищённые адреса отвечают `401`.
 
 Важные особенности формата (отражены в типах): `price` приходит **строкой**;
 `description`, `image_name`, `avatar_file_name` могут быть `null`.
@@ -333,6 +407,9 @@ E2E в CI не запускаются — им нужна установка б�
 ### Чего тесты не покрывают
 
 - `HttpApiService` — вся ветка работы с настоящим бэкендом; в тестах и E2E используются моки.
+- **Аутентификация целиком** — `AuthProvider`, `Protected`, `LoginPage`, `RegisterPage`.
+  Проверялась вручную: вход, выход, прямой заход гостем на защищённый адрес, оформление заказа
+  без входа, сохранение сессии после перезагрузки. Автотестов нет.
 - Страницы `MenuPage`, `ProductPage`, `ProfilePage`, `CartPage` — компонентных тестов нет,
   частично затронуты через E2E.
 - Роутер (`basePath`, `navigate`) — отдельных юнит-тестов нет, проверяется косвенно в E2E.
@@ -354,11 +431,17 @@ E2E в CI не запускаются — им нужна установка б�
 
 ## 📌 Известные упрощения
 
-- Аутентификации нет: профиль и заказы грузятся для захардкоженного `id` (`getUser(1)`,
-  `getOrders(1)`); `userId` передаётся в контракт «на вырост», но mock не фильтрует по нему.
 - Адрес доставки и оплата — статичные заглушки в вёрстке; платёжной системы нет
   (новый заказ сразу получает статус `preparing`).
-- В mock-режиме `total` приходит с клиента (готовый `finalPrice`); настоящий бэкенд должен
-  пересчитывать сумму сам — `useOrderTotals` это React-хук и на «сервере» недоступен.
+- **Демо-режим имитирует не всё.** Пароль не проверяется (подойдёт любой), занятый телефон при
+  регистрации не отлавливается, заказы не привязаны к пользователю (новый аккаунт видит те же
+  примеры), а сессия и созданные аккаунты живут в памяти вкладки — после F5 демо снова открывается
+  под демо-пользователем. Состояние `unavailable` в демо не воспроизводится: мок не умеет
+  отвечать сетевой ошибкой. Всё это касается только `VITE_DATA_SOURCE=mock`; с настоящим
+  бэкендом работают полные правила.
+- В mock-режиме `total` принимается от клиента как есть (готовый `finalPrice`) — `useOrderTotals`
+  это React-хук, и «серверу» из мока он недоступен. Настоящий бэкенд сумму пересчитывает сам и
+  лишь сверяет с присланной (расхождение → `409`), поэтому подделать цену через мок можно,
+  через API — нет.
 - Заказы в mock-режиме не сохраняются между перезагрузками (живут в памяти модуля).
 - Задеплоенная на GitHub Pages версия работает только на моках — бэкенд в проде не развёрнут.

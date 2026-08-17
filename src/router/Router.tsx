@@ -6,6 +6,7 @@ import ProductPage from '../pages/ProductPage/ProductPage'
 import OrdersPage from '../pages/OrdersPage/OrdersPage'
 import Protected from './Protected'
 import LoginPage from '@/pages/Auth/LoginPage'
+import RegisterPage from '@/pages/Auth/RegisterPage'
 import ProfileSkeleton from '@/pages/ProfilePage/ProfileSkeleton'
 import OrdersSkeleton from '@/pages/OrdersPage/OrdersSkeleton'
 import { useCurrentPath } from './useCurrentPath'
@@ -22,6 +23,7 @@ const Router = () => {
     if (normalizedPath === '/') return <MenuPage />;
     if (normalizedPath === '/cart') return <CartPage />;
     if (normalizedPath === '/login') return <LoginPage onSuccess={() => navigate('/')} />;
+    if (normalizedPath === '/register') return <RegisterPage onSuccess={() => navigate('/')} />;
     if (normalizedPath === '/profile') return <Protected fallback={<ProfileSkeleton />}><ProfilePage /></Protected>;
     if (normalizedPath === '/orders') return <Protected fallback={<OrdersSkeleton />}><OrdersPage /></Protected>;
 

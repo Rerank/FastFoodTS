@@ -24,6 +24,18 @@
     line-height: 1.25;
 }
 
+/* Пояснение под заголовком. Сейчас используется для пометки о демо-режиме:
+   без неё посетитель не знает, что вводить в форму.
+   max-width в ch не даёт строке растянуться на широком экране. */
+.auth-header__subtitle {
+    max-width: 34ch;
+    margin: clamp(6px, 2vw, 10px) 0 0;
+    color: var(--color-muted);
+    font-size: clamp(12px, 3.2vw, 15px);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
 /* ----- Форма ----- */
 .auth-form {
     display: flex;
