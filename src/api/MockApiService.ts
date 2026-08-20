@@ -1,7 +1,7 @@
 import type { ApiService } from '@/api/types';
 import { mockCategories, mockProducts, mockPromotions, mockUsers, mockOrders } from '@/api/mockData';
 import { mapProductToDomain, mapOrderToDomain } from '@/api/mappers';
-import type { OrderItemDto, OrderDto } from '@/types/order';
+import type { OrderItemDto, OrderDto, Order } from '@/types/order';
 import type { User } from '@/types/user';
 
 const delay = (ms: number) => {
@@ -14,6 +14,7 @@ const delay = (ms: number) => {
 
 const SIMULATED_DELAY = 180;
 let currentUser: User | null = mockUsers[0]; //logout устанавливает null
+const ordersByKey = new Map<string, Order>(); // словарь для функционала идемпотентности (ключ:заказ)
 
 
 export const mockApiService: ApiService = {
@@ -105,7 +106,7 @@ export const mockApiService: ApiService = {
     return { data: orders, error: null };
 
   },
-  createOrder: async (orderPayload) => {
+  createOrder: async (orderPayload, idempotencyKey) => {
     await delay(1500);
 
     if (!currentUser) {
@@ -118,6 +119,13 @@ export const mockApiService: ApiService = {
         }
       };
     }
+
+    const alreadyCreated = ordersByKey.get(idempotencyKey);
+    if (alreadyCreated) {
+      return { data: alreadyCreated, error: null };
+    }
+
+    //----сборка заказа----
 
     const items: OrderItemDto[] = [];
 
@@ -152,7 +160,11 @@ export const mockApiService: ApiService = {
     };
 
     mockOrders.push(newOrderDto);
-    return { data: mapOrderToDomain(newOrderDto), error: null };
+
+    const order = mapOrderToDomain(newOrderDto);
+    ordersByKey.set(idempotencyKey, order);
+
+    return { data: order, error: null };
   }
 
 

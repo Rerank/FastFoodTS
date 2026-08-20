@@ -128,13 +128,13 @@ export const httpApiService: ApiService = {
         }
 
     },
-    createOrder: async (orderPayload) => {
+    createOrder: async (orderPayload, idempotencyKey) => {
         const result = await fetchWithErrorHandling<OrderDto>(
             `${API_BASE_URL}/orders`,
             isObject,
             {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
                 body: JSON.stringify(orderPayload),
             }
         );

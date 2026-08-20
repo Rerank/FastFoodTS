@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react'
+import { useRef, useState, type SubmitEvent } from 'react'
 import { useCart } from '@/context/useCart';
 import { useAuth } from '@/context/useAuth';
 import LoginPage from '@/pages/Auth/LoginPage'
@@ -8,6 +8,7 @@ import { apiService } from '@/api/apiService';
 import { IMAGE_BASE_URL, PLACEHOLDER_PRODUCT_IMAGE } from '@/utils/constants';
 import { formatPrice, pluralize } from '@/utils/formatters';
 import { navigate } from "@/router/navigate";
+import { randomId } from "@/utils/randomId";
 import { useOrderTotals } from '@/utils/useOrderTotals';
 import type { CreateOrderPayload } from '@/types/order';
 import ImageWithFallback from '@/components/common/ImageWithFallback/ImageWithFallback'
@@ -39,6 +40,7 @@ const CartPage = () => {
     const [status, setStatus] = useState<CheckoutStatus>('idle');
     const [error, setError] = useState<string | null>(null);
     const [needsAuth, setNeedsAuth] = useState(false);
+    const idempotencyKeyRef = useRef<string | null>(null);
 
 
     const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -58,13 +60,23 @@ const CartPage = () => {
 
         setStatus('processing')
 
-        const apiResult = await apiService.createOrder(orderPayload);
+        // Ключ на попытку: создаём при первой отправке и сохраняем на все повторы
+        if (!idempotencyKeyRef.current) {
+            idempotencyKeyRef.current = randomId();
+        }
+
+        const apiResult = await apiService.createOrder(orderPayload, idempotencyKeyRef.current);
 
         if (apiResult.error) {
-            setError(apiResult.error.message);
+            // отдельное сообщения для обрыва связи, т.к. заказ может быть создан, но не дошел ответ
+            setError(apiResult.error.kind === 'network'
+                ? 'Не удалось подтвердить заказ. Проверьте «Мои заказы» — возможно, он уже создан.'
+                : apiResult.error.message);
             setStatus('error');
             return;
         }
+
+        idempotencyKeyRef.current = null; // попытка успешная, ключ больше не нужен
 
         clearCart();
         setStatus('success');

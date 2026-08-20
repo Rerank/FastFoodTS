@@ -27,7 +27,7 @@ export interface ApiService {
     logout(): Promise<ApiResult<null>>;
 
     getOrders(): Promise<ApiResult<Order[]>>;
-    createOrder(orderPayload: CreateOrderPayload): Promise<ApiResult<Order>>;
+    createOrder(orderPayload: CreateOrderPayload, idempotencyKey: string): Promise<ApiResult<Order>>;
 }
 
   
